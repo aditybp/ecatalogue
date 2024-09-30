@@ -5,82 +5,56 @@ namespace App\Http\Controllers;
 use App\Models\users;
 use App\Http\Requests\StoreusersRequest;
 use App\Http\Requests\UpdateusersRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UsersController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function store(Request $request)
     {
-        //
-    }
+        $validator = Validator::make($request->all(), [
+            'nama_lengkap' => 'required|string|max:255',
+            'nik' => 'required|integer',
+            'email' => 'required|string|max:255',
+            'nrp' => 'required|string|max:255',
+            'satuan_kerja' => 'required',
+            'balai' => 'required',
+            'no_handphone' => 'required|integer'
+        ]);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'validasi gagal!',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreusersRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreusersRequest $request)
-    {
-        //
-    }
+        try {
+            $user = new users();
+            $user->nama_lengkap = $request->nama_lengkap;
+            $user->no_handphone = $request->no_handphone;
+            $user->nik = $request->nik;
+            $user->email = $request->email;
+            $user->nrp = $request->nrp;
+            $user->surat_penugasan_url = $request->surat_penugasan_url;
+            $user->satuan_kerja_id = $request->satuan_kerja_id;
+            $user->balai_kerja_id = $request->balai_kerja_id;
+            $user->status = 'register';
+            $user->save();
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\users  $users
-     * @return \Illuminate\Http\Response
-     */
-    public function show(users $users)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\users  $users
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(users $users)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateusersRequest  $request
-     * @param  \App\Models\users  $users
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateusersRequest $request, users $users)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\users  $users
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(users $users)
-    {
-        //
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pengguna berhasil disimpan',
+                'data' => $user
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan pengguna',
+                'error' => $th->getMessage()
+            ], 500);
+        }
+        
     }
 }
