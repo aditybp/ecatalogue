@@ -32,6 +32,8 @@ class UsersController extends Controller
 
         //tambah kondisi pengecekan nrp, nik, dan no hp tidak boleh sama di database if status = active
 
+        //$checkNrp = ;
+
         try {
             $user = new users();
             $user->nama_lengkap = $request->nama_lengkap;
@@ -61,7 +63,7 @@ class UsersController extends Controller
         
     }
 
-    function getUserById($id) 
+    public function getUserById($id) 
     {
         try {
             $user = users::find($id);
