@@ -17,8 +17,8 @@ class UsersController extends Controller
             'nik' => 'required|integer',
             'email' => 'required|string|max:255',
             'nrp' => 'required|string|max:255',
-            'satuan_kerja' => 'required',
-            'balai' => 'required',
+            'satuan_kerja_id' => 'required',
+            'balai_kerja_id' => 'required',
             'no_handphone' => 'required|integer'
         ]);
 
@@ -29,6 +29,8 @@ class UsersController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+
+        //tambah kondisi pengecekan nrp, nik, dan no hp tidak boleh sama di database if status = active
 
         try {
             $user = new users();
@@ -41,6 +43,7 @@ class UsersController extends Controller
             $user->satuan_kerja_id = $request->satuan_kerja_id;
             $user->balai_kerja_id = $request->balai_kerja_id;
             $user->status = 'register';
+            $user->id_roles = 1;
             $user->save();
 
             return response()->json([
@@ -56,5 +59,26 @@ class UsersController extends Controller
             ], 500);
         }
         
+    }
+
+    function getUserById($id) 
+    {
+        try {
+            $user = users::find($id);
+
+            //tambahkan konsisi cek if data found dan if not found
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'berhasil menampilkan data',
+                'data' => $user
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'berhasil menampilkan data',
+                'error' => $th->getMessage()
+            ], 500);
+        }
     }
 }

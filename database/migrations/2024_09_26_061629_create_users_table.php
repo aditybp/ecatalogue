@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('nip');
             $table->unsignedBigInteger('satuan_kerja_id');
             $table->unsignedBigInteger('balai_kerja_id');
-            $table->enum('status', ['active', 'register', 'expired']);
+            $table->enum('status', ['active', 'register', 'expired', 'verification']);
             $table->timestamp('created_at')->nullable(); 
             $table->timestamp('edited_at')->nullable(); 
             $table->timestamp('deleted_at')->nullable();
