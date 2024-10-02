@@ -20,5 +20,5 @@ use App\Http\Controllers\UsersController;
 // });
 
 Route::post('/store-user', [UsersController::class, 'store']);
+Route::get('/test', [UsersController::class, 'test']);
 Route::get('/get-user/{id}', [UsersController::class, 'getUserById']);
-
