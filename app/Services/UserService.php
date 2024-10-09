@@ -12,6 +12,7 @@ class UserService
 
     public function checkUserIfExist($userId)
     {
-        return Users::find($userId)->first();
+        return Users::find($userId);
     }
+
 }

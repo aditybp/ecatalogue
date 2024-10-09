@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\users;
 use App\Services\UserService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,7 +22,7 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
             'nik' => 'required|integer',
-            'email' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
             'nrp' => 'required|string|max:255',
             'satuan_kerja_id' => 'required',
             'balai_kerja_id' => 'required',
@@ -59,6 +60,8 @@ class UsersController extends Controller
             $user->id_roles = 1; //menyusul tergantung ntarnya
             $user->save();
 
+            event(new Registered($user)); //send email verification
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Pengguna berhasil disimpan',
@@ -67,7 +70,7 @@ class UsersController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal menyimpan pengguna',
+                'message' => 'Gagal menyimpan pengguna',    
                 'error' => $th->getMessage()
             ]);
         }

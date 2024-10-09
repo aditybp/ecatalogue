@@ -14,9 +14,9 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
-    ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -36,8 +36,8 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
+        'api' => [
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
@@ -62,7 +62,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Accounts::class,
         ],
 
         // 'users' => [
@@ -107,5 +107,11 @@ return [
     */
 
     'password_timeout' => 10800,
+
+    'jwt' => [
+        'secret' => env('JWT_SECRET'),
+        'ttl' => env('JWT_TTL', 60), // 1 hour
+        'refresh_ttl' => env('JWT_REFRESH_TTL', 20160), // 2 weeks
+    ],
 
 ];
