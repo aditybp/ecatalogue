@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('balai_kerja_id');
             $table->enum('status', ['active', 'register', 'expired', 'verification']);
             $table->timestamp('created_at')->nullable(); 
-            $table->timestamp('edited_at')->nullable(); 
+            $table->timestamp('updated_at')->nullable(); 
             $table->timestamp('deleted_at')->nullable();
 
             //foreign key
