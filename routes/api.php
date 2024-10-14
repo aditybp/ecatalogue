@@ -7,6 +7,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\PerencanaanDataController;
 use App\Http\Controllers\VendorController;
 
 
@@ -26,9 +27,6 @@ use App\Http\Controllers\VendorController;
 // });
 
 Route::get('/send-username/{id}', [AccountController::class, 'sendUsernameAndEmail']);
-Route::post('/check', [AccountController::class, 'check']);
-Route::get('/compare/{id}', [AccountController::class, 'compare']);
-
 
 Route::post('/store-user', [UsersController::class, 'store']);
 Route::post('/login', [LoginController::class, 'login']);
@@ -38,11 +36,13 @@ Route::get('/get-user/{id}', [UsersController::class, 'getUserById']);
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
-
 //password reset routes
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
-
 Route::get('/show-allvendor', [VendorController::class, 'allVendor']);
 Route::post('/input-vendor', [VendorController::class, 'inputVendor']);
+
+Route::post('/perencanaan-data/store-informasi-umum/', [PerencanaanDataController::class, 'storeInformasiUmumData']);
+Route::get('/perencanaan-data/informasi-umum/{id}', [PerencanaanDataController::class, 'getInformasiUmumByPerencanaanId']);
+Route::post('/perencanaan-data/identifikasi-kebutuhan', [PerencanaanDataController::class, 'storeIdentifikasiKebutuhan']);
