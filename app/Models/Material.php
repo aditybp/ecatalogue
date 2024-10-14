@@ -11,7 +11,6 @@ class Material extends Model
 
     protected $table = 'material';
     protected $fillable = [
-        'perencanaan_data_id',
         'nama_material', 
         'satuan', 
         'spesifikasi', 

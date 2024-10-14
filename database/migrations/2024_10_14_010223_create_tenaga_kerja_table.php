@@ -13,17 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('peralatan', function (Blueprint $table) {
+        Schema::create('tenaga_kerja', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('perencanaan_data_id');
-            $table->string('nama_peralatan');
+            $table->string('jenis_tenaga_kerja');
             $table->string('satuan');
-            $table->string('spesifikasi');
-            $table->string('kapasitas');
-            $table->string('kodefikasi');
-            $table->string('kelompok_peralatan');
             $table->string('jumlah_kebutuhan');
-            $table->string('merk');
+            $table->string('kodefikasi');
             $table->unsignedBigInteger('provincies_id');
             $table->unsignedBigInteger('cities_id');
             $table->timestamp('created_at')->nullable(); 
@@ -39,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('peralatan');
+        Schema::dropIfExists('tenaga_kerja');
     }
 };
