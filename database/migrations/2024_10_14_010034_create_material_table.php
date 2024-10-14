@@ -13,16 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('informasi_umum', function (Blueprint $table) {
+        Schema::create('material', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('perencanaan_data_id');
-            $table->string('kode_rup')->nullable();
-            $table->string('nama_paket');
-            $table->string('nama_ppk');
-            $table->string('jabatan_ppk');
-            $table->string('nama_balai')->nullable();
-            $table->string('tipologi')->nullable();
-            $table->enum('jenis_informasi', ['sipasti', 'manual']);
+            $table->string('nama_material');
+            $table->string('satuan');
+            $table->string('spesifikasi');
+            $table->string('ukuran');
+            $table->string('kodefikasi');
+            $table->string('kelompok_material');
+            $table->string('jumlah_kebutuhan');
+            $table->string('merk');
+            $table->unsignedBigInteger('provincies_id');
+            $table->unsignedBigInteger('cities_id');
             $table->timestamp('created_at')->nullable(); 
             $table->timestamp('updated_at')->nullable(); 
             $table->timestamp('deleted_at')->nullable();
@@ -36,6 +38,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_informasi_umum');
+        Schema::dropIfExists('material');
     }
 };

@@ -11,7 +11,6 @@ class TenagaKerja extends Model
 
     protected $table = 'tenaga_kerja';
     protected $fillable = [
-        'perencanaan_data_id',
         'jenis_tenaga_kerja', 
         'satuan', 
         'jumlah_kebutuhan',
