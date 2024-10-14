@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tenaga_kerja', function (Blueprint $table) {
+        Schema::create('informasi_umum', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('perencanaan_data_id');
-            $table->string('jenis_tenaga_kerja');
-            $table->string('satuan');
-            $table->string('jumlah_kebutuhan');
-            $table->string('kodefikasi');
-            $table->unsignedBigInteger('provincies_id');
-            $table->unsignedBigInteger('cities_id');
+            $table->string('kode_rup')->nullable();
+            $table->string('nama_paket');
+            $table->string('nama_ppk');
+            $table->string('jabatan_ppk');
+            $table->string('nama_balai')->nullable();
+            $table->string('tipologi')->nullable();
+            $table->enum('jenis_informasi', ['sipasti', 'manual']);
             $table->timestamp('created_at')->nullable(); 
             $table->timestamp('updated_at')->nullable(); 
             $table->timestamp('deleted_at')->nullable();
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tenaga_kerja');
+        Schema::dropIfExists('table_informasi_umum');
     }
 };

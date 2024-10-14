@@ -11,7 +11,6 @@ class Peralatan extends Model
 
     protected $table = 'peralatan';
     protected $fillable = [
-        'perencanaan_data_id',
         'nama_peralatan', 
         'satuan', 
         'spesifikasi', 
