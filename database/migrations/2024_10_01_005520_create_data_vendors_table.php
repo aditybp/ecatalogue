@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('data_vendors', function (Blueprint $table) {
             $table->id();
             $table->string('nama_vendor');
-            $table->unsignedBigInteger('jenis_vendor_id');
-            $table->unsignedBigInteger('kategori_vendor_id');
+            $table->json('jenis_vendor_id');
+            $table->json('kategori_vendor_id');
             $table->text('alamat');
             $table->string('no_telepon');
             $table->string('no_hp');

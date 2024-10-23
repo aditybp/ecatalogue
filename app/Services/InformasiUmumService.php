@@ -27,7 +27,7 @@ class InformasiUmumService
         
         if ($dataInformasiUmum->tipe_informasi_umum == 'manual') {
             $informasiUmum->nama_balai = $dataInformasiUmum->nama_balai;
-            $informasiUmum->tipologi = $dataInformasiUmum->tipologi;
+            //$informasiUmum->tipologi = $dataInformasiUmum->tipologi;
         }
 
         $data = $informasiUmum->save();
