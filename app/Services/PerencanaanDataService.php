@@ -7,20 +7,32 @@ use App\Models\PerencanaanData;
 
 class PerencanaanDataService
 {
-    public function listAllPerencanaanData()
+    private function getInformasiAndShortlistById($id)
     {
-        $informasiUmum = PerencanaanData::join('informasi_umum', 'perencanaan_data.informasi_umum_id', '=', 'informasi_umum.id')
-        ->join('rup', 'perencanaan_data.rup_id', '=', 'rup.id')
-        ->join('paket', 'informasi_umum.paket_id', '=', 'paket.id')
-        ->select(
-            'informasi_umum.kode_rup',
-            'informasi_umum.nama_paket',
-            'perencanaan_data.nama_ppk',
-            'perencanaan_data.jabatan_ppk',
-            'rup.rup_name',
-            'paket.paket_name'
-        )
-    ->get();   
+        return PerencanaanData::where('identifikasi', true);
     }
-    
+
+    public function listAllPerencanaanData($data)
+    {
+        // $identifikasiKebutuhan = $this->informasiUmumById($data);
+        // $informasiUmumAndShortlist = '';
+    }
+
+    public function updatePerencanaanData($informasiUmumId, $field, $value)
+    {
+        $perencanaanData = PerencanaanData::where('informasi_umum_id', $informasiUmumId)->first();
+        if (!$perencanaanData) {
+            return false;
+        }
+
+        if ($field == 'identifikasi_kebutuhan') {
+            $perencanaanData->identifikasi_kebutuhan_id = $value;
+        } elseif ($field == 'shortlist_vendor') {
+            $perencanaanData->shortlist_vendor_id = $value;
+        }
+
+        $perencanaanData->save();
+        return true;
+    }
+
 }

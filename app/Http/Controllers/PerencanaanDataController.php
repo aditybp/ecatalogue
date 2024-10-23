@@ -5,20 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\InformasiUmumService;
 use App\Services\IdentifikasiKebutuhanService;
+use App\Services\ShortlistVendorService;
+use App\Services\PerencanaanDataService;
+use App\Services\GeneratePdfService;
 use Illuminate\Support\Facades\Validator;
 
 class PerencanaanDataController extends Controller
 {
     protected $informasiUmumService;
     protected $IdentifikasiKebutuhanService;
+    protected $shortlistVendorService;
+    protected $perencanaanDataService;
+    protected $generatePdfService;
 
     public function __construct(
         InformasiUmumService $informasiUmumService, 
-        IdentifikasiKebutuhanService $IdentifikasiKebutuhanService
+        IdentifikasiKebutuhanService $IdentifikasiKebutuhanService,
+        ShortlistVendorService $shortlistVendorService,
+        PerencanaanDataService $perencanaanDataService,
+        GeneratePdfService $generatePdfService
         ) 
     {
         $this->informasiUmumService = $informasiUmumService;
         $this->IdentifikasiKebutuhanService = $IdentifikasiKebutuhanService;
+        $this->shortlistVendorService = $shortlistVendorService;
+        $this->perencanaanDataService = $perencanaanDataService;
+        $this->generatePdfService = $generatePdfService;
     }
     /**
      * Display a listing of the resource.
@@ -187,20 +199,24 @@ class PerencanaanDataController extends Controller
             ]);
         }
         try {
+            $identifikasiKebutuhanId = $request->informasi_umum_id;
             $materialResult = [];
             foreach ($request->material as $material) {
-                $this->IdentifikasiKebutuhanService->storeMaterial($material);
+                $materialResult[] = $this->IdentifikasiKebutuhanService->storeMaterial($material, $identifikasiKebutuhanId);
             }
 
             $peralatanResult = [];
             foreach ($request->peralatan as $peralatan) {
-                $this->IdentifikasiKebutuhanService->storePeralatan($peralatan);
+                $peralatanResult[] = $this->IdentifikasiKebutuhanService->storePeralatan($peralatan, $identifikasiKebutuhanId);
             }
 
             $tenagaKerjaResult = [];
             foreach ($request->tenaga_kerja as $tenagaKerja) {
-                $this->IdentifikasiKebutuhanService->storeTenagaKerja($tenagaKerja);
+                $tenagaKerjaResult[] = $this->IdentifikasiKebutuhanService->storeTenagaKerja($tenagaKerja, $identifikasiKebutuhanId);
             }
+
+            //update to perencanaan_data table
+            $this->perencanaanDataService->updatePerencanaanData($identifikasiKebutuhanId, 'identifikasi_kebutuhan', $identifikasiKebutuhanId);
 
             return response()->json([
                 'status' => 'success',
@@ -218,6 +234,123 @@ class PerencanaanDataController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    public function getAllDataVendor() 
+    {
+        $dataVendor = $this->shortlistVendorService->getDataVendor();
+        if ($dataVendor) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil didapat!',
+                'data' => $dataVendor
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Data berhasil tidak dapat ditemukan!',
+            'data' => []
+        ]);
+    }
+
+    public function selectDataVendor(Request $request) 
+    {
+        $rules = [
+            'shortlist_vendor' => 'required|array',
+                'shortlist_vendor.*.data_vendor_id' => 'required',
+                'shortlist_vendor.*.nama_vendor' => 'required',
+                'shortlist_vendor.*.pemilik_vendor' => 'required',
+                'shortlist_vendor.*.alamat' => 'required',
+                'shortlist_vendor.*.kontak' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed!',
+                'errors' => $validator->errors()
+            ]);
+        }
+        try {
+            $shortlistVendorId = $request->identifikasi_kebutuhan_id;
+            $dataShortlistvendor = [];
+            foreach ($request->shortlist_vendor as $shortlistVendor) {
+                $dataShortlistvendor[] = $this->shortlistVendorService->storeShortlistVendor($shortlistVendor,  $shortlistVendorId);
+            }
+
+            $this->perencanaanDataService->updatePerencanaanData($shortlistVendorId, 'shortlist_vendor', $shortlistVendorId);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil disimpan!',
+                'shortlist_vendor_id' => $shortlistVendorId,
+                'data' => [
+                    'shortlist_vendor' => $dataShortlistvendor,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data!',
+                'error' => $e->getMessage()
+            ]);
+        }        
+    }
+
+    public function informasiUmumResult(Request $request) 
+    {
+        $getInformasiUmum = $this->perencanaanDataService->listAllPerencanaanData($request);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data berhasil didapat!',
+            'data' => $getInformasiUmum,
+        ]);
+    }
+
+    public function identifikasiKebutuhanResult(Request $request) 
+    {
+        $getMaterial = $this->IdentifikasiKebutuhanService->getIdentifikasiKebutuhanByPerencanaanId('material', $request);
+        $getPeralatan = $this->IdentifikasiKebutuhanService->getIdentifikasiKebutuhanByPerencanaanId('peralatan', $request);
+        $getTenagaKerja = $this->IdentifikasiKebutuhanService->getIdentifikasiKebutuhanByPerencanaanId('tenaga_kerja', $request);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data berhasil didapat!',
+            'data' => [
+                'material' => $getMaterial,
+                'peralatan' => $getPeralatan,
+                'tenaga_kerja' => $getTenagaKerja,
+            ],
+        ]);
+    }
+
+    public function shortlistVendorResult(Request $request) 
+    {
+        $getShortlistVendor = $this->shortlistVendorService->getShortlistVendorResult($request);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data berhasil didapat!',
+            'data' => $getShortlistVendor,
+        ]);
+    }
+
+    public function generatePdf() 
+    {
+        //return $this->shortlistVendorService->taggingInfoToPdf(1);
+        // try {
+        //     $pdfOutput = $this->generatePdfService->generatePdfMaterialNatural();
+
+        //     return response($pdfOutput)
+        //             ->header('Content-Type', 'application/pdf')
+        //             ->header('Content-Disposition', 'attachment; filename="generated_pdf.pdf"');
+        // } catch (\Exception $e) {
+        //     return response()->json(['error' => $e->getMessage()], 500);
+        // }
     }
 
 }
