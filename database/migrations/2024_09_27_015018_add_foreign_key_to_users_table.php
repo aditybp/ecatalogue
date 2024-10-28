@@ -13,17 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreign('satuan_kerja_id')
-            ->references('id')
-            ->on('satuan_kerja')
-            ->onDelete('cascade');
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->foreign('satuan_kerja_id')
+        //     ->references('id')
+        //     ->on('satuan_kerja')
+        //     ->onDelete('cascade');
 
-            $table->foreign('balai_kerja_id')
-            ->references('id')
-            ->on('satuan_balai_kerja')
-            ->onDelete('cascade');
-        });
+        //     $table->foreign('balai_kerja_id')
+        //     ->references('id')
+        //     ->on('satuan_balai_kerja')
+        //     ->onDelete('cascade');
+        // });
     }
 
     /**
@@ -33,9 +33,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['satuan_kerja_id']);
-            $table->dropForeign(['balai_kerja_id']);
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->dropForeign(['satuan_kerja_id']);
+        //     $table->dropForeign(['balai_kerja_id']);
+        // });
     }
 };

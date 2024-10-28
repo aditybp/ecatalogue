@@ -13,28 +13,28 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('data_vendors', function (Blueprint $table) {
-            $table->foreign('jenis_vendor_id')
-            ->references('id')
-            ->on('jenis_vendors')
-            ->onDelete('cascade');
+        // Schema::table('data_vendors', function (Blueprint $table) {
+        //     $table->foreign('jenis_vendor_id')
+        //     ->references('id')
+        //     ->on('jenis_vendors')
+        //     ->onDelete('cascade');
 
-            $table->foreign('kategori_vendor_id')
-            ->references('id')
-            ->on('kategori_vendors')
-            ->onDelete('cascade');
+        //     $table->foreign('kategori_vendor_id')
+        //     ->references('id')
+        //     ->on('kategori_vendors')
+        //     ->onDelete('cascade');
             
-            $table->foreign('provinsi_id')
-            ->references('id')
-            ->on('provinces')
-            ->onDelete('cascade');
+        //     $table->foreign('provinsi_id')
+        //     ->references('id')
+        //     ->on('provinces')
+        //     ->onDelete('cascade');
 
-            $table->foreign('kota_id')
-            ->references('id')
-            ->on('cities')
-            ->onDelete('cascade');
+        //     $table->foreign('kota_id')
+        //     ->references('id')
+        //     ->on('cities')
+        //     ->onDelete('cascade');
 
-        });
+        // });
     }
 
     /**

@@ -13,23 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('cities', function (Blueprint $table) {
-            $table->foreign('provinsi_id')
-            ->references('id')
-            ->on('provinces')
-            ->onDelete('cascade');
-        });
+        // Schema::table('cities', function (Blueprint $table) {
+        //     $table->foreign('provinsi_id')
+        //     ->references('id')
+        //     ->on('provinces')
+        //     ->onDelete('cascade');
+        // });
 
-        Schema::table('accounts', function (Blueprint $table) {
-            $table->foreign('user_id')
-            ->references('id')
-            ->on('users')
-            ->onDelete('cascade');
-        });
+        // Schema::table('accounts', function (Blueprint $table) {
+        //     $table->foreign('user_id')
+        //     ->references('id')
+        //     ->on('users')
+        //     ->onDelete('cascade');
+        // });
 
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('nip');
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->dropColumn('nip');
+        // });
     }
 
     /**
