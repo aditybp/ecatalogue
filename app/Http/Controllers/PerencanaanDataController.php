@@ -339,18 +339,25 @@ class PerencanaanDataController extends Controller
         ]);
     }
 
-    public function generatePdf() 
+    public function perencanaanDataResult(Request $request) 
     {
-        //return $this->shortlistVendorService->taggingInfoToPdf(1);
-        // try {
-        //     $pdfOutput = $this->generatePdfService->generatePdfMaterialNatural();
+        $id = $request->query('id');
 
-        //     return response($pdfOutput)
-        //             ->header('Content-Type', 'application/pdf')
-        //             ->header('Content-Disposition', 'attachment; filename="generated_pdf.pdf"');
-        // } catch (\Exception $e) {
-        //     return response()->json(['error' => $e->getMessage()], 500);
-        // }
+        $data = $this->perencanaanDataService->listAllPerencanaanData($id);
+
+        if (!isset($data)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'data tidak ditemukan!',
+                'data' => []
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data berhasil didapat!',
+            'data' => $data
+        ]);
     }
 
 }

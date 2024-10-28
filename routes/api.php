@@ -49,5 +49,5 @@ Route::post('/perencanaan-data/store-identifikasi-kebutuhan', [PerencanaanDataCo
 
 Route::get('/perencanaan-data/get-data-vendor', [PerencanaanDataController::class, 'getAllDataVendor']);
 Route::post('/perencanaan-data/store-shortlist-vendor', [PerencanaanDataController::class, 'selectDataVendor']);
-Route::get('/perencanaan-data/generate-pdf', [PerencanaanDataController::class, 'generatePdf']);
+Route::get('/perencanaan-data/perencanaan-data-result', [PerencanaanDataController::class, 'perencanaanDataResult']);
 

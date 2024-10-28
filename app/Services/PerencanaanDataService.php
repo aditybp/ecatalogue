@@ -2,20 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\InformasiUmum;
 use App\Models\PerencanaanData;
 
 class PerencanaanDataService
 {
-    private function getInformasiAndShortlistById($id)
+    public function listAllPerencanaanData($id)
     {
-        return PerencanaanData::where('identifikasi', true);
-    }
-
-    public function listAllPerencanaanData($data)
-    {
-        // $identifikasiKebutuhan = $this->informasiUmumById($data);
-        // $informasiUmumAndShortlist = '';
+        $query = PerencanaanData::with(['informasiUmum', 'material', 'peralatan', 'tenagaKerja', 'shortlistVendor'])->where('informasi_umum_id', $id)->first();
+        return $query;
     }
 
     public function updatePerencanaanData($informasiUmumId, $field, $value)
