@@ -13,12 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('kategori_vendors', function (Blueprint $table) {
-            $table->foreign('jenis_vendor_id')
-            ->references('id')
-            ->on('jenis_vendors')
-            ->onDelete('cascade');
-        });
+        // Schema::table('kategori_vendors', function (Blueprint $table) {
+        //     $table->foreign('jenis_vendor_id')
+        //     ->references('id')
+        //     ->on('jenis_vendors')
+        //     ->onDelete('cascade');
+        // });
     }
 
     /**
@@ -28,8 +28,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('kagetori_vendors', function (Blueprint $table) {
-            //
-        });
+        // Schema::table('kagetori_vendors', function (Blueprint $table) {
+        //     //
+        // });
     }
 };
