@@ -14,6 +14,6 @@ class InformasiUmum extends Model
 
     public function perencanaanData()
     {
-        return $this->hasOne(PerencanaanData::class, 'informasi_umum_id', 'id');
+        return $this->hasMany(PerencanaanData::class, 'informasi_umum_id', 'id');
     }
 }

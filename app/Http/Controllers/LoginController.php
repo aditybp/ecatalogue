@@ -2,20 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Accounts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\users;
 use App\Services\UserService;
 use App\Services\LoginService;
 use Exception;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth; 
 use Illuminate\Support\Facades\Auth;
-use PHPOpenSourceSaver\JWTAuth\Contracts\Providers\Auth as ProvidersAuth;
-use PHPOpenSourceSaver\JWTAuth\Http\Parser\AuthHeaders;
-use Throwable;
 
 class LoginController extends Controller
 {

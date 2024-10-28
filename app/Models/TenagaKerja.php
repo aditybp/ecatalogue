@@ -18,4 +18,9 @@ class TenagaKerja extends Model
         'provincies_id',
         'cities_id',
     ];
+
+    public function perencanaanData()
+    {
+        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id','identifikasi_kebutuhan_id');
+    }
 }
