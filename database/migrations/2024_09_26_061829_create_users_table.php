@@ -26,11 +26,6 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable(); 
             $table->timestamp('updated_at')->nullable(); 
             $table->timestamp('deleted_at')->nullable();
-
-            //foreign key
-            // $table->foreign('id_roles')->references('id')->on('roles');
-            // $table->foreign('satuan_kerja_id')->references('id')->on('satuan_kerja');
-            // $table->foreign('balai_kerja_id')->references('id')->on('balai_kerja');
         });
     }
 
