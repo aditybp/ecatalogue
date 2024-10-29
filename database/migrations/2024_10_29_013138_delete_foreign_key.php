@@ -14,14 +14,14 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['id_roles']);
-            $table->dropForeign(['satuan_kerja_id']);
-            $table->dropForeign(['balai_kerja_id']);
+            $table->dropIndex(['id_roles']);
+            $table->dropIndex(['satuan_kerja_id']);
+            $table->dropIndex(['balai_kerja_id']);
         });
 
-        // Schema::table('kategori_vendors', function (Blueprint $table) {
-        //     $table->dropForeign(['jenis_vendor_id']);
-        // });
+        Schema::table('kategori_vendors', function (Blueprint $table) {
+            $table->dropIndex(['jenis_vendor_id']);
+        });
     }
 
     /**
