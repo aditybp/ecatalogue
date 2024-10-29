@@ -19,9 +19,9 @@ return new class extends Migration
             $table->dropForeign(['balai_kerja_id']);
         });
 
-        Schema::table('kategori_vendors', function (Blueprint $table) {
-            $table->dropForeign(['jenis_vendor_id']);
-        });
+        // Schema::table('kategori_vendors', function (Blueprint $table) {
+        //     $table->dropForeign(['jenis_vendor_id']);
+        // });
     }
 
     /**
