@@ -24,7 +24,8 @@ class VendorController extends Controller
             'no_hp' => 'required|integer',
             'provinsi_id' => 'required',
             'kota_id' => 'required',
-            'koordinat' => 'required|string'
+            'koordinat' => 'required|string',
+            'sumber_daya' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -49,6 +50,7 @@ class VendorController extends Controller
             $vendor->koordinat = $request->koordinat;
             $vendor->logo_url = $request->logo_url;
             $vendor->dok_pendukung_url = $request->dok_pendukung_url;
+            $vendor->sumber_daya = $request->sumber_daya;
             $vendor->save();
 
             return response()->json([

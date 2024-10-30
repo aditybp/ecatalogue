@@ -44,8 +44,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('data_vendor', function (Blueprint $table) {
-            //
-        });
+        // Schema::table('data_vendor', function (Blueprint $table) {
+        //     //
+        // });
     }
 };

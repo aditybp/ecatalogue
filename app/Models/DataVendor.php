@@ -11,7 +11,7 @@ class DataVendor extends Model
 
     protected $fillable = ['nama_vendor', 'jenis_vendor_id', 'kategori_vendor_id', 'alamat', 'no_telepon',
                             'no_hp', 'nama_pic', 'provinsi_id', 'kota_id', 'koordinat', 'logo_url',
-                            'dok_pendukung_url'];
+                            'dok_pendukung_url', 'sumber_daya'];
 
     public function provinces()
     {
