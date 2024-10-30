@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ResetPasswordMail;
 use App\Models\Accounts;
 use Illuminate\Http\Request;
 use App\Models\Users;
@@ -9,15 +10,11 @@ use App\Notifications\ResetPasswordNorification;
 use Illuminate\Support\Facades\Mail;
 use App\Notifications\ResetPasswordNotification;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Log;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class ForgotPasswordController extends Controller
 {
-    public function __construct()
-    {
-        
-    }
-
     public function sendResetLinkEmail(Request $request) 
     {
         $request->validate([
@@ -25,12 +22,25 @@ class ForgotPasswordController extends Controller
         ]);
 
         $users = Accounts::where('username', $request->email)->first();
-        //dd($users);
+
+        if (!$users) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'user tidak ditemukan!',
+                'data' => []
+            ]);
+        }
 
         $token = JWTAuth::fromUser($users);
-        //dd($token);
 
-        $users->notify(new ResetPasswordNorification($token));
+        try {
+            //$users->notify(new ResetPasswordNorification($token));
+            Mail::to($users->username)->send(new ResetPasswordMail($token, $users->username));
+        } catch (\Exception $e) {
+            Log::error('Error sending password reset notification: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to send email'], 500);
+
+        }
 
         return response()->json(['message' => 'Reset password link sent']);
     }
