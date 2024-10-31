@@ -8,6 +8,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PerencanaanDataController;
+use App\Http\Controllers\ProvinceAndCitiesController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Mail;
 
@@ -63,4 +64,6 @@ Route::get('/test-email', function () {
 Route::get('/password/reset/{token}', function ($token) {
     return view('auth.password.reset', ['token' => $token]);
 })->name('password.reset');
+
+Route::get('/provinces-and-cities', [ProvinceAndCitiesController::class, 'getProvinceAndCities']);
 
