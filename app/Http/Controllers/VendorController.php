@@ -15,26 +15,26 @@ class VendorController extends Controller
 
     public function inputVendor(Request $request){
 
-        $validator = Validator::make($request->all(), [
-            'nama_vendor' => 'required|string|max:255', 
-            'jenis_vendor_id' => 'required', 
-            'kategori_vendor_id' => 'required', 
-            'alamat' => 'required|string|max:255', 
-            'no_telepon' => 'required|integer',
-            'no_hp' => 'required|integer',
-            'provinsi_id' => 'required',
-            'kota_id' => 'required',
-            'koordinat' => 'required|string',
-            'sumber_daya' => 'required|string'
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'nama_vendor' => 'required|string|max:255', 
+        //     'jenis_vendor_id' => 'required', 
+        //     'kategori_vendor_id' => 'required', 
+        //     'alamat' => 'required|string|max:255', 
+        //     'no_telepon' => 'required|string',
+        //     'no_hp' => 'required|integer',
+        //     'provinsi_id' => 'required',
+        //     'kota_id' => 'required',
+        //     'koordinat' => 'required|string',
+        //     'sumber_daya' => 'required|string'
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'validasi gagal!',
-                'data' => []
-            ]);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'validasi gagal!',
+        //         'data' => []
+        //     ]);
+        // }
 
         try{
             $vendor = new DataVendor();

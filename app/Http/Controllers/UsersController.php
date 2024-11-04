@@ -26,7 +26,7 @@ class UsersController extends Controller
             'nrp' => 'required|string|max:255',
             'satuan_kerja_id' => 'required',
             'balai_kerja_id' => 'required',
-            'no_handphone' => 'required|integer'
+            'no_handphone' => 'required|string'
         ]);
 
         if ($validator->fails()) {
