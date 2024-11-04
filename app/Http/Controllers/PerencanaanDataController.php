@@ -158,46 +158,47 @@ class PerencanaanDataController extends Controller
 
     public function storeIdentifikasiKebutuhan(Request $request)
     {
-        $rules = [
-            'material' => 'required|array',
-                'material.*.nama_material' => 'required',
-                'material.*.satuan' => 'required',
-                'material.*.spesifikasi' => 'required',
-                'material.*.ukuran' => 'required',
-                'material.*.kodefikasi' => 'required',
-                'material.*.kelompok_material' => 'required',
-                'material.*.jumlah_kebutuhan' => 'required',
-                'material.*.merk' => 'required',
-                'material.*.provincies_id' => 'required',
-                'material.*.cities_id' => 'required',
-            'peralatan' => 'required|array',
-                'peralatan.*.nama_peralatan' => 'required',
-                'peralatan.*.satuan' => 'required',
-                'peralatan.*.spesifikasi' => 'required',
-                'peralatan.*.kapasitas' => 'required',
-                'peralatan.*.kodefikasi' => 'required',
-                'peralatan.*.kelompok_peralatan' => 'required',
-                'peralatan.*.jumlah_kebutuhan' => 'required',
-                'peralatan.*.merk' => 'required',
-                'peralatan.*.provincies_id' => 'required',
-                'peralatan.*.cities_id' => 'required',
-            'tenaga_kerja' => 'required|array',
-                'tenaga_kerja.*.jenis_tenaga_kerja' => 'required',
-                'tenaga_kerja.*.satuan' => 'required',
-                'tenaga_kerja.*.jumlah_kebutuhan' => 'required',
-                'tenaga_kerja.*.kodefikasi' => 'required',
-                'tenaga_kerja.*.provincies_id' => 'required',
-                'tenaga_kerja.*.cities_id' => 'required',
-        ];
+        // $rules = [
+        //     'material' => 'required|array',
+        //         'material.*.nama_material' => 'required',
+        //         'material.*.satuan' => 'required',
+        //         'material.*.spesifikasi' => 'required',
+        //         'material.*.ukuran' => 'required',
+        //         'material.*.kodefikasi' => 'required',
+        //         'material.*.kelompok_material' => 'required',
+        //         'material.*.jumlah_kebutuhan' => 'required',
+        //         'material.*.merk' => 'required',
+        //         'material.*.provincies_id' => 'required',
+        //         'material.*.cities_id' => 'required',
+        //     'peralatan' => 'required|array',
+        //         'peralatan.*.nama_peralatan' => 'required',
+        //         'peralatan.*.satuan' => 'required',
+        //         'peralatan.*.spesifikasi' => 'required',
+        //         'peralatan.*.kapasitas' => 'required',
+        //         'peralatan.*.kodefikasi' => 'required',
+        //         'peralatan.*.kelompok_peralatan' => 'required',
+        //         'peralatan.*.jumlah_kebutuhan' => 'required',
+        //         'peralatan.*.merk' => 'required',
+        //         'peralatan.*.provincies_id' => 'required',
+        //         'peralatan.*.cities_id' => 'required',
+        //     'tenaga_kerja' => 'required|array',
+        //         'tenaga_kerja.*.jenis_tenaga_kerja' => 'required',
+        //         'tenaga_kerja.*.satuan' => 'required',
+        //         'tenaga_kerja.*.jumlah_kebutuhan' => 'required',
+        //         'tenaga_kerja.*.kodefikasi' => 'required',
+        //         'tenaga_kerja.*.provincies_id' => 'required',
+        //         'tenaga_kerja.*.cities_id' => 'required',
+        // ];
 
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed!',
-                'errors' => $validator->errors()
-            ]);
-        }
+        // $validator = Validator::make($request->all(), $rules);
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Validation failed!',
+        //         'errors' => $validator->errors()
+        //     ]);
+        // }
+        
         try {
             $identifikasiKebutuhanId = $request->informasi_umum_id;
             $materialResult = [];
@@ -236,9 +237,9 @@ class PerencanaanDataController extends Controller
         }
     }
 
-    public function getAllDataVendor() 
+    public function getAllDataVendor($id) 
     {
-        $dataVendor = $this->shortlistVendorService->getDataVendor();
+        $dataVendor = $this->shortlistVendorService->getDataVendor($id);
         if ($dataVendor) {
             return response()->json([
                 'status' => 'success',
