@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ShortlistVendor;
 use Illuminate\Http\Request;
 use App\Services\InformasiUmumService;
 use App\Services\IdentifikasiKebutuhanService;
@@ -264,6 +265,7 @@ class PerencanaanDataController extends Controller
                 'shortlist_vendor.*.pemilik_vendor' => 'required',
                 'shortlist_vendor.*.alamat' => 'required',
                 'shortlist_vendor.*.kontak' => 'required',
+                'shortlist_vendor.*.sumber_daya' => 'required',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -360,5 +362,15 @@ class PerencanaanDataController extends Controller
             'data' => $data
         ]);
     }
+
+    // public function adjustShortlistVendor()
+    // {
+        
+    // }
+
+    // public function getShortlistVendorSumberDaya($id)
+    // {
+    //     $queryData = $this->shortlistVendorService->getDataShortlistIdentifikasi($id);
+    // }
 
 }

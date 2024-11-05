@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Codedge\Fpdf\Fpdf\Fpdf;
 use App\Models\DataVendor;
+use App\Models\KuisionerPdfData;
+use App\Models\ShortlistVendor;
 use Illuminate\Validation\Rules\Exists;
 
 class GeneratePdfService
@@ -79,12 +81,12 @@ class GeneratePdfService
         $pdf->SetXY(83, 48);
         $pdf->Cell(40, 100, $kategoriResponden);
 
-        $fileName = 'generated_pdf_'. time() .'.pdf';
-        $filePath = public_path('kuisioner/'.$fileName);
+        $fileName = 'generated_pdf_' . time() . '.pdf';
+        $filePath = public_path('kuisioner/' . $fileName);
 
         $pdf->Output($filePath, 'F');
 
-        $pdfUrl = url('kuisioner/'. $fileName);
+        $pdfUrl = url('kuisioner/' . $fileName);
         return $pdfUrl;
     }
 
@@ -92,5 +94,16 @@ class GeneratePdfService
     {
         return DataVendor::with(['provinces', 'cities'])->find($id);
     }
+
+    // public function getKuisionerData($id)
+    // {
+
+
+    //     $query = ShortlistVendor::with('material', 'peralatan', 'tenaga_kerja')
+    //     ->where(shortlistVendor.sumber_daya like %$variable% material.nama_material)
+    //     ->where(shortlistVendor.sumber_daya like %$variable% material.jenis_tenaga_kerja)
+    //     ->where(shortlistVendor.sumber_daya like %$variable% material.nama_perlatan)
+    //     ->where(shortlistVendor.shortlistvendorid = material, perlatan, tenaga_kerja.identifikasi_kebutuhan_id)
+    // }
 
 }

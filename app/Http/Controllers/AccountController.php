@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendUsernameAndPassword;
 use App\Services\UserService;
 use App\Services\LoginService;
 use App\Models\Accounts;
 use Exception;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 
@@ -14,12 +16,11 @@ class AccountController extends Controller
 {
     protected $userService;
     protected $loginService;
-    
+
     public function __construct(
-        UserService $userService, 
+        UserService $userService,
         LoginService $loginService
-    )
-    {
+    ) {
         $this->userService = $userService;
         $this->loginService = $loginService;
     }
@@ -27,23 +28,25 @@ class AccountController extends Controller
     public function sendUsernameAndEmail($userId)
     {
         $checkUserId = $this->userService->checkUserIfExist($userId);
-        
+
         if (!$checkUserId) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'user id '. $userId .' tidak dapat ditemukan!',
+                'message' => 'user id ' . $userId . ' tidak dapat ditemukan!',
                 'data' => []
             ]);
         }
 
         try {
             $generatePassword = (string) Str::random(5);
-            
+
             $accounts = Accounts::create([
                 'user_id' => $checkUserId['id'],
                 'username' => $checkUserId['email'],
                 'password' =>  Hash::make($generatePassword),
             ]);
+
+            Mail::to($checkUserId['email'])->send(new SendUsernameAndPassword($checkUserId['email'], $generatePassword));
 
             return response()->json([
                 'status' => 'success',
@@ -51,7 +54,6 @@ class AccountController extends Controller
                 'data' => $accounts,
                 'debug' => $generatePassword
             ]);
-
         } catch (Exception $th) {
             return response()->json([
                 'status' => 'error',
