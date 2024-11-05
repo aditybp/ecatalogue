@@ -8,7 +8,7 @@ use App\Models\ShortlistVendor;
 
 class ShortlistVendorService
 {
-    public function getDataVendor($id)
+    private function getIdentifikasiKebutuhanByIdentifikasiId($id)
     {
         $getDataIdentifikasi = PerencanaanData::with([
             'material:id,identifikasi_kebutuhan_id,nama_material', 
@@ -17,6 +17,7 @@ class ShortlistVendorService
         ])->select('identifikasi_kebutuhan_id')->where('identifikasi_kebutuhan_id', $id)
         ->get();
 
+        
         $identifikasikebutuhan = $getDataIdentifikasi->flatMap(function($item) {
 
             $materials = $item->material->pluck('nama_material')->toArray();
@@ -26,7 +27,12 @@ class ShortlistVendorService
             return array_merge($materials, $peralatans, $tenagaKerjas);
         });
 
-        $resultArray = $identifikasikebutuhan->toArray();
+        return $identifikasikebutuhan->toArray();
+    }
+
+    public function getDataVendor($id)
+    {
+        $resultArray = $this->getIdentifikasiKebutuhanByIdentifikasiId($id);
         
         $queryDataVendors = DataVendor::all();
 
@@ -56,7 +62,10 @@ class ShortlistVendorService
                     'pemilik_vendor' => $item->nama_pic,
                     'alamat' => $item->alamat,
                     'kontak' => $item->no_telepon,
-                    'sumber_daya' => $item->sumber_daya
+                    'sumber_daya' => $item->sumber_daya,
+                    'material_id' => $item->material_id,
+                    'peralatan_id' => $item->peralatan_id,
+                    'tenaga_kerja_id' => $item->tenaga_kerja_id
                 ];
             }
         }
@@ -65,7 +74,7 @@ class ShortlistVendorService
 
     public function storeShortlistVendor($data, $shortlistVendorId)
     {
-        $makeKuisioner = app(GeneratePdfService::class)->generatePdfMaterialNatural($data['data_vendor_id']);
+        //$makeKuisioner = app(GeneratePdfService::class)->generatePdfMaterialNatural($data['data_vendor_id']);
 
         $shortlistVendor = new ShortlistVendor();
         $shortlistVendor->data_vendor_id = $data['data_vendor_id'];
@@ -74,7 +83,7 @@ class ShortlistVendorService
         $shortlistVendor->pemilik_vendor = $data['pemilik_vendor'];
         $shortlistVendor->alamat = $data['alamat'];
         $shortlistVendor->kontak = $data['kontak'];
-        $shortlistVendor->url_kuisioner = $makeKuisioner;
+        $shortlistVendor->sumber_daya = $data['sumber_daya'];
         $shortlistVendor->save();
         return $shortlistVendor->toArray();
     }
@@ -92,13 +101,9 @@ class ShortlistVendorService
         $lowercasedArray2 = array_map('strtolower', $array2);
 
         foreach ($lowercasedArray1 as $value1) {
-            // Loop through each item in the second array
             foreach ($lowercasedArray2 as $value2) {
-                // Check if the second value is a substring of the first value
                 if (strpos($value1, $value2) !== false) {
-                    // If it matches, add the original value from array1 (not lowercased)
-                    $matches[] = $value1; // Add the full value from $array1
-                    break; // No need to check further for this value1
+                    $matches[] = $value1; 
                 }
             }
         } 
