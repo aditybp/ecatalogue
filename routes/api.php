@@ -51,11 +51,12 @@ Route::post('/perencanaan-data/store-identifikasi-kebutuhan', [PerencanaanDataCo
 Route::get('/perencanaan-data/get-data-vendor/{id}', [PerencanaanDataController::class, 'getAllDataVendor']);
 Route::post('/perencanaan-data/store-shortlist-vendor', [PerencanaanDataController::class, 'selectDataVendor']);
 Route::get('/perencanaan-data/perencanaan-data-result', [PerencanaanDataController::class, 'perencanaanDataResult']);
+Route::get('/perencanaan-data/shortlist-detail-identifikasi/{id}', [PerencanaanDataController::class, 'getShortlistVendorSumberDaya']);
 
 Route::get('/test-email', function () {
     Mail::raw('This is a test email', function ($message) {
         $message->to('bayuaditya0111@gmail.com')
-                ->subject('Test Email');
+            ->subject('Test Email');
     });
 
     return 'Email sent!';
@@ -66,4 +67,3 @@ Route::get('/password/reset/{token}', function ($token) {
 })->name('password.reset');
 
 Route::get('/provinces-and-cities', [ProvinceAndCitiesController::class, 'getProvinceAndCities']);
-
