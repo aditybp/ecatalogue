@@ -11,20 +11,25 @@ class Material extends Model
 
     protected $table = 'material';
     protected $fillable = [
-        'nama_material', 
-        'satuan', 
-        'spesifikasi', 
-        'ukuran', 
-        'kodefikasi', 
+        'nama_material',
+        'satuan',
+        'spesifikasi',
+        'ukuran',
+        'kodefikasi',
         'kelompok_material',
         'jumlah_kebutuhan',
         'merk',
         'provincies_id',
         'cities_id',
     ];
-    
+
     public function perencanaanData()
     {
-        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id','identifikasi_kebutuhan_id');
+        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id', 'identifikasi_kebutuhan_id');
+    }
+
+    public function shortlist_vendor()
+    {
+        return $this->belongsTo(ShortlistVendor::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
     }
 }

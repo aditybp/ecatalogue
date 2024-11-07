@@ -15,4 +15,24 @@ class ShortlistVendor extends Model
     {
         return $this->belongsTo(PerencanaanData::class, 'shortlist_vendor_id', 'shortlist_vendor_id');
     }
+
+    public function data_vendor()
+    {
+        return $this->belongsTo(DataVendor::class, 'data_vendor_id', 'id');
+    }
+
+    public function material()
+    {
+        return $this->hasMany(Material::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
+    }
+
+    public function peralatan()
+    {
+        return $this->hasMany(Peralatan::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
+    }
+
+    public function tenaga_kerja()
+    {
+        return $this->hasMany(TenagaKerja::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
+    }
 }

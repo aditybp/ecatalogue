@@ -11,16 +11,21 @@ class TenagaKerja extends Model
 
     protected $table = 'tenaga_kerja';
     protected $fillable = [
-        'jenis_tenaga_kerja', 
-        'satuan', 
+        'jenis_tenaga_kerja',
+        'satuan',
         'jumlah_kebutuhan',
-        'kodefikasi', 
+        'kodefikasi',
         'provincies_id',
         'cities_id',
     ];
 
     public function perencanaanData()
     {
-        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id','identifikasi_kebutuhan_id');
+        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id', 'identifikasi_kebutuhan_id');
+    }
+
+    public function  shortlist_vendor()
+    {
+        return $this->belongsTo(ShortlistVendor::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
     }
 }

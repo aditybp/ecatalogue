@@ -11,11 +11,11 @@ class Peralatan extends Model
 
     protected $table = 'peralatan';
     protected $fillable = [
-        'nama_peralatan', 
-        'satuan', 
-        'spesifikasi', 
-        'kapasitas', 
-        'kodefikasi', 
+        'nama_peralatan',
+        'satuan',
+        'spesifikasi',
+        'kapasitas',
+        'kodefikasi',
         'kelompok_peralatan',
         'jumlah_kebutuhan',
         'merk',
@@ -25,6 +25,11 @@ class Peralatan extends Model
 
     public function perencanaanData()
     {
-        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id','identifikasi_kebutuhan_id');
+        return $this->belongsTo(PerencanaanData::class, 'identifikasi_kebutuhan_id', 'identifikasi_kebutuhan_id');
+    }
+
+    public function  shortlist_vendor()
+    {
+        return $this->belongsTo(ShortlistVendor::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
     }
 }
