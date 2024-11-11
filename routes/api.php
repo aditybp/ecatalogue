@@ -51,7 +51,8 @@ Route::post('/perencanaan-data/store-identifikasi-kebutuhan', [PerencanaanDataCo
 Route::get('/perencanaan-data/get-data-vendor/{id}', [PerencanaanDataController::class, 'getAllDataVendor']);
 Route::post('/perencanaan-data/store-shortlist-vendor', [PerencanaanDataController::class, 'selectDataVendor']);
 Route::get('/perencanaan-data/perencanaan-data-result', [PerencanaanDataController::class, 'perencanaanDataResult']);
-Route::get('/perencanaan-data/shortlist-detail-identifikasi/{id}', [PerencanaanDataController::class, 'getShortlistVendorSumberDaya']);
+Route::get('/perencanaan-data/shortlist-detail-identifikasi', [PerencanaanDataController::class, 'getShortlistVendorSumberDaya']);
+Route::post('/perencanaan-data/adjust-identifikasi-kebutuhan', [PerencanaanDataController::class, 'adjustShortlistVendor']);
 
 Route::get('/test-email', function () {
     Mail::raw('This is a test email', function ($message) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ShortlistVendor;
+use App\Models\TenagaKerja;
 use Illuminate\Http\Request;
 use App\Services\InformasiUmumService;
 use App\Services\IdentifikasiKebutuhanService;
@@ -353,14 +354,62 @@ class PerencanaanDataController extends Controller
 
     public function adjustShortlistVendor(Request $request)
     {
-        $rules = [];
+        $rules = [
+            'id_vendor' => 'required',
+            'shortlist_vendor_id' => 'required',
+
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed!',
+                'errors' => $validator->errors()
+            ]);
+        }
 
         try {
-            //code...
-        } catch (\Throwable $th) {
-            //throw $th;
+            $shortlistVendorId = $request['shortlist_vendor_id'];
+            $vendorId = $request['id_vendor'];
+            $material = [];
+            $peralatan = [];
+            $tenagaKerja = [];
+
+            if (count($request['material'])) {
+                foreach ($request['material'] as $item) {
+                    $material[] = $item['id'];
+                }
+            }
+
+            if (count($request['peralatan'])) {
+                foreach ($request['peralatan'] as $item) {
+                    $peralatan[] = $item['id'];
+                }
+            }
+
+            if (count($request['tenaga_kerja'])) {
+                foreach ($request['tenaga_kerja'] as $item) {
+                    $tenagaKerja[] = $item['id'];
+                }
+            }
+
+            $saveData = $this->shortlistVendorService->saveKuisionerPdfData($vendorId, $shortlistVendorId, $material, $peralatan, $tenagaKerja);
+            if (count($saveData)) {
+                //dd($saveData);
+                $generatePdf = $this->generatePdfService->generatePdfMaterial($saveData);
+                return $generatePdf;
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data!',
+                'error' => $e->getMessage()
+            ]);
         }
     }
+
+    public function testIdentifikasi() {}
 
     public function getShortlistVendorSumberDaya(Request $request)
     {

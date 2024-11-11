@@ -12,10 +12,7 @@ class KuisionerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
-    }
+    public function getKuisionerData($id) {}
 
     /**
      * Store a newly created resource in storage.
