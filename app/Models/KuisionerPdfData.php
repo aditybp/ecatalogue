@@ -9,5 +9,5 @@ class KuisionerPdfData extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['material', 'peralatan', 'tenaga_kerja', 'shortlist_id', 'vendor_id'];
+    protected $fillable = ['material_id', 'peralatan_id', 'tenaga_kerja_id', 'shortlist_id', 'vendor_id'];
 }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\DataVendor;
 use App\Models\PerencanaanData;
 use App\Models\ShortlistVendor;
+use App\Models\KuisionerPdfData;
 use Illuminate\Support\Facades\DB;
 
 class ShortlistVendorService
@@ -174,6 +175,26 @@ class ShortlistVendorService
             }
         }
 
-        return $identifikasi;
+        $resultData = [
+            'id_vendor' => $query['data_vendor_id'],
+            'identifikasi_kebutuhan' => $identifikasi
+        ];
+
+        return $resultData;
+    }
+
+    public function saveKuisionerPdfData($idVendor, $idShortlistVendor, $material, $peralatan, $tenagaKerja)
+    {
+
+        $kuisionerData = KuisionerPdfData::updateOrCreate(
+            ['shortlist_id' => $idShortlistVendor, 'vendor_id' => $idVendor],
+            [
+                'material_id' => (count($material)) ? json_encode($material) : null,
+                'peralatan_id' => (count($peralatan)) ? json_encode($peralatan) : null,
+                'tenaga_kerja_id' => (count($tenagaKerja)) ? json_encode($tenagaKerja) : null,
+            ]
+        );
+
+        return $kuisionerData->toArray();
     }
 }
