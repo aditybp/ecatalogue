@@ -197,4 +197,13 @@ class ShortlistVendorService
 
         return $kuisionerData->toArray();
     }
+
+    public function saveUrlPdf($vendorId, $shortlistVendorId, $url)
+    {
+        $data = ShortlistVendor::updateOrCreate(
+            ['data_vendor_id' => $vendorId, 'shortlist_vendor_id' => $shortlistVendorId],
+            ['url_kuisioner' => $url]
+        );
+        return $data['url_kuisioner'];
+    }
 }
