@@ -4,18 +4,22 @@ namespace App\Services;
 
 use Codedge\Fpdf\Fpdf\Fpdf;
 use App\Models\DataVendor;
-use App\Models\KuisionerPdfData;
 use App\Models\Material;
 use App\Models\Peralatan;
 use App\Models\ShortlistVendor;
 use App\Models\TenagaKerja;
-use Illuminate\Validation\Rules\Exists;
 use setasign\Fpdi\Fpdi;
 
 class GeneratePdfService
 {
+    public function saveUrlPdf($dataVendorId, $url)
+    {
+        return ShortlistVendor::updateOrCreate(['id' => $dataVendorId], ['url_kuisioner' => $url]);
+    }
+
     public function generatePdfMaterial($data)
     {
+        $pdfFiles = [];
         $dataVendor = $this->getVendorById($data['vendor_id']);
 
         if (!isset($dataVendor)) {
@@ -24,16 +28,20 @@ class GeneratePdfService
 
         if ($data['material_id']) {
             $pdfMaterial = $this->pdfMaterial($dataVendor, json_decode($data['material_id']));
+            $pdfFiles[] = $pdfMaterial;
         }
         if ($data['peralatan_id']) {
             $pdfPeralatan = $this->pdfPeralatan($dataVendor, json_decode($data['peralatan_id']));
+            $pdfFiles[] = $pdfPeralatan;
         }
         if ($data['tenaga_kerja_id']) {
             $pdfTenagaKerja = $this->pdfTenagaKerja($dataVendor, json_decode($data['tenaga_kerja_id']));
+            $pdfFiles[] = $pdfTenagaKerja;
         }
-        //dd($pdfTenagaKerja);
+        $resultPdf = $this->mergePdf($pdfFiles);
 
-        return $pdfTenagaKerja;
+
+        return $resultPdf;
     }
 
     private function getVendorById($id)
@@ -58,6 +66,7 @@ class GeneratePdfService
 
     private function pdfMaterial($dataVendor, $id)
     {
+        $pdfTempPath = [];
 
         $identifikasiKebutuhan = $this->getIdentifikasi($id, 'material');
 
@@ -71,9 +80,9 @@ class GeneratePdfService
         $pdfInformasiUmum = $this->materialPdfInformasiUmum($templatePath, $dataVendor);
         $pdfIdentifikasi = $this->materialPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
 
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi);
 
-        return $pdfIdentifikasi;
-        // return ('kuisioner/' . $fileName);
+        return $pdfTempPath;
     }
 
     private function materialPdfIdentifikasi($templatePath, $data)
@@ -82,6 +91,86 @@ class GeneratePdfService
             throw new \Exception('Data is not an array or is empty.');
         }
 
+        $pdfFiles = [];
+        $count = 1;
+        $Y = 60;
+        $pdf = new Fpdf();
+        $pdf->AddPage('L');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Image($templatePath, 0, 0, 297, 210);
+
+        foreach ($data as $value) {
+
+            //no
+            $pdf->SetXY(17, $Y);
+            $pdf->Cell(5, 8, $count, 0, 0, 'C');
+
+            //nama
+            $pdf->SetXY(24, $Y);
+            $pdf->MultiCell(21, 4, $value['nama_material'], 0, 'L');
+
+            //spesifikasi
+            $pdf->SetXY(45, $Y);
+            $pdf->MultiCell(22, 4, $value['spesifikasi'], 0, 'L');
+
+            //satuan
+            $pdf->SetXY(68, $Y);
+            $pdf->MultiCell(10, 4, $value['satuan'], 0, 'L');
+
+            //satuan
+            $pdf->SetXY(82, $Y);
+            $pdf->MultiCell(10, 4, $value['merk'], 0, 'L');
+
+            $Y += 13;
+
+            if ($count % 10 == 0) {
+                $pdf->Output();
+
+                $pdf->AddPage('L');
+                $pdf->SetFont('Arial', 'B', 6);
+                $pdf->Image($templatePath, 0, 0, 297, 210);
+                $Y = 60;
+            }
+
+            $count++;
+        }
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFilePath);
+        $pdfFiles[] = $tempFilePath;
+
+        return $pdfFiles;
+    }
+
+    private function mergePdf($pdfFiles)
+    {
+        $flattenedArray = array_merge(...$pdfFiles);
+        $pdf = new Fpdi();
+        foreach ($flattenedArray as $file) {
+            $pageCount = $pdf->setSourceFile($file);
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $templateId = $pdf->importPage($pageNo);
+                $pdf->AddPage('L');
+                $pdf->useTemplate($templateId);
+            }
+            unlink($file);
+        }
+
+        $randomFileName = uniqid('pdf_', true) . '.pdf';
+        $savePath = public_path('kuisioner/' . $randomFileName);
+        $pdf->Output('F', $savePath);
+        $url = asset('kuisioner/' . $randomFileName);
+
+        return $url;
+    }
+
+    private function peralatanPdfIdentifikasi($templatePath, $data)
+    {
+        if (!is_array($data) || empty($data)) {
+            throw new \Exception('Data is not an array or is empty.');
+        }
+
+        $pdfFiles = [];
         $count = 1;
         $Y = 36;
         $pdf = new Fpdf();
@@ -97,18 +186,15 @@ class GeneratePdfService
 
             //nama
             $pdf->SetXY(43, $Y);
-            //$pdf->MultiCell(21, 4, $value['nama_material'], 1, 'L');
-            $pdf->MultiCell(37, 4, 'eksavator PC-200', 0, 'L');
+            $pdf->MultiCell(37, 4, $value['nama_peralatan'], 0, 'L');
 
             //spesifikasi
             $pdf->SetXY(82, $Y);
-            //$pdf->MultiCell(22, 4, $value['spesifikasi'], 1, 'L');
-            $pdf->MultiCell(35, 4, 'kapasitas bucket 0,8 m3', 0, 'L');
+            $pdf->MultiCell(35, 4, $value['spesifikasi'], 0, 'L');
 
             //satuan
             $pdf->SetXY(119, $Y);
-            //$pdf->MultiCell(10, 4, $value['satuan'], 1, 'L');
-            $pdf->MultiCell(18, 4, '1 jam', 0, 'L');
+            $pdf->MultiCell(18, 4, $value['satuan'], 1, 'L');
 
             $Y += 9.5;
 
@@ -124,25 +210,122 @@ class GeneratePdfService
             $count++;
         }
 
-        return $pdf->Output('I', 'material_identifikasi.pdf');
-    }
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFilePath);
+        $pdfFiles[] = $tempFilePath;
 
-    private function mergePdf($pdfFiles)
-    {
-        $pdf = new Fpdi();
-        foreach ($pdfFiles as $file) {
-            $pageCount = $pdf->setSourceFile($file);
-            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-                $templateId = $pdf->importPage($pageNo);
-                $pdf->AddPage();
-                $pdf->useTemplate($templateId);
-            }
-            unlink($file);
-        }
-        $pdf->Output('I', 'merged.pdf');
+        return $pdfFiles;
     }
 
     private function materialPdfInformasiUmum($templatePath, $dataVendor)
+    {
+        $provinsi = $dataVendor->provinces->nama_provinsi;
+        $kabupaten = $dataVendor->cities->nama_kota;
+        $namaResponden = $dataVendor['nama_vendor'];
+        $alamat = $dataVendor['alamat'];
+        $geoTagging = $dataVendor['koordinat'];
+        $telepon = $dataVendor['no_telepon'];
+        $email = '-';
+        $kategoriResponden = '-';
+        $idProvinsi = $dataVendor->cities->provinsi_id;
+        $idKabupatenKota = $dataVendor->cities->kode_kota;
+
+        $pdf = new Fpdf();
+        $pdf->AddPage('L');
+
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Image($templatePath, 0, 0, 297, 210);
+
+        //provinsi
+        $pdf->SetXY(83, 22);
+        $pdf->Cell(40, 100, $provinsi);
+
+        //id provinsi
+        $pdf->SetXY(180, 68.5);
+        $pdf->Cell(24, 5, $idProvinsi, 0, 0, 'L');
+
+        //id kabupaten kota
+        $pdf->SetXY(180, 73);
+        $pdf->Cell(24, 5, $idKabupatenKota, 0, 0, 'L');
+
+        //kota/kabupaten
+        $pdf->SetXY(83, 27);
+        $pdf->Cell(40, 100, $kabupaten);
+
+        //nama responden
+        $pdf->SetXY(83, 32);
+        $pdf->Cell(40, 100, $namaResponden);
+
+        //alamat responden
+        $pdf->SetXY(83, 37);
+        $pdf->Cell(40, 100, $alamat);
+
+        //tagging responden
+        $pdf->SetXY(153, 37);
+        $pdf->Cell(40, 100, $geoTagging, 0, 0, 'L');
+
+        //telepon responden
+        $pdf->SetXY(83, 42);
+        $pdf->Cell(40, 100, $telepon);
+
+        //telepon responden
+        $pdf->SetXY(153, 42);
+        $pdf->Cell(40, 100, $email, 0, 0, 'L');
+
+        //kategori responden
+        $pdf->SetXY(83, 47);
+        $pdf->Cell(40, 100, $kategoriResponden);
+
+        $tempFIlePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFIlePath);
+        $pdfFiles[] = $tempFIlePath;
+
+        return $pdfFiles;
+    }
+
+    private function pdfPeralatan($id, $dataVendor)
+    {
+        $pdfTempPath = [];
+
+        $identifikasiKebutuhan = $this->getIdentifikasi($id, 'peralatan');
+
+        $templatePath = resource_path('views/pdf/template_peralatan.jpg');
+        $templateIdentifikasiPath = resource_path('views/pdf/template_peralatan_identifikasi.jpg');
+
+        if (!file_exists($templatePath) || !file_exists($templateIdentifikasiPath)) {
+            throw new \Exception('Template not found');
+        }
+
+        $pdfInformasiUmum = $this->pdfPeralatanInformasiUmum($templatePath, $dataVendor);
+        $pdfIdentifikasi = $this->peralatanPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
+
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi);
+
+        return $pdfTempPath;
+    }
+
+    private function pdfTenagaKerja($dataVendor, $id)
+    {
+        $pdfTempPath = [];
+
+        $identifikasiKebutuhan = $this->getIdentifikasi($id, 'tenaga_kerja');
+
+        $templatePath = resource_path('views/pdf/template_tenaga_kerja.jpg');
+        $templateIdentifikasiPath = resource_path('views/pdf/template_tenaga_kerja_identifikasi.jpg');
+
+        if (!file_exists($templatePath) || !file_exists($templateIdentifikasiPath)) {
+            throw new \Exception('Template not found');
+        }
+
+        $pdfInformasiUmum = $this->pdfPeralatanInformasiUmum($templatePath, $dataVendor);
+        $pdfIdentifikasi = $this->tenagaKerjaPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
+
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi);
+
+        return $pdfTempPath;
+    }
+
+    private function pdfPeralatanInformasiUmum($templatePath, $dataVendor)
     {
         $provinsi = $dataVendor->provinces->nama_provinsi;
         $kabupaten = $dataVendor->cities->nama_kota;
@@ -201,48 +384,11 @@ class GeneratePdfService
         $pdf->SetXY(110, 53);
         $pdf->Cell(40, 100, $kategoriResponden);
 
-        // $fileName = 'generated_pdf_' . time() . '.pdf';
-        // $filePath = public_path('kuisioner/' . $fileName);
+        $tempFIlePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFIlePath);
+        $pdfFiles[] = $tempFIlePath;
 
-        // $pdf->Output($filePath, 'F');
-
-        return $pdf->Output('I', 'material_identifikasi.pdf');
-    }
-
-    private function pdfPeralatan($id, $dataVendor)
-    {
-        $identifikasiKebutuhan = $this->getIdentifikasi($id, 'peralatan');
-
-        $templatePath = resource_path('views/pdf/template_peralatan.jpg');
-        $templateIdentifikasiPath = resource_path('views/pdf/template_peralatan_identifikasi.jpg');
-
-        if (!file_exists($templatePath) || !file_exists($templateIdentifikasiPath)) {
-            throw new \Exception('Template not found');
-        }
-
-        $pdfInformasiUmum = $this->materialPdfInformasiUmum($templatePath, $dataVendor);
-        //$pdfIdentifikasi = $this->materialPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
-
-
-        return $pdfInformasiUmum;
-    }
-
-    private function pdfTenagaKerja($dataVendor, $id)
-    {
-        $identifikasiKebutuhan = $this->getIdentifikasi($id, 'tenaga_kerja');
-
-        $templatePath = resource_path('views/pdf/template_tenaga_kerja.jpg');
-        $templateIdentifikasiPath = resource_path('views/pdf/template_peralatan_identifikasi.jpg');
-
-        if (!file_exists($templatePath) || !file_exists($templateIdentifikasiPath)) {
-            throw new \Exception('Template not found');
-        }
-
-        //$pdfInformasiUmum = $this->materialPdfInformasiUmum($templatePath, $dataVendor);
-        $pdfIdentifikasi = $this->materialPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
-
-
-        return $pdfIdentifikasi;
+        return $pdfFiles;
     }
 
     private function tenagaKerjaPdfIdentifikasi($templatePath, $data)
@@ -251,6 +397,7 @@ class GeneratePdfService
             throw new \Exception('Data is not an array or is empty.');
         }
 
+        $pdfFiles = [];
         $count = 1;
         $Y = 60;
         $pdf = new Fpdf();
@@ -283,6 +430,10 @@ class GeneratePdfService
             $count++;
         }
 
-        return $pdf->Output('I', 'material_identifikasi.pdf');
+        $tempFIlePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFIlePath);
+        $pdfFiles[] = $tempFIlePath;
+
+        return $pdfFiles;
     }
 }

@@ -396,10 +396,22 @@ class PerencanaanDataController extends Controller
 
             $saveData = $this->shortlistVendorService->saveKuisionerPdfData($vendorId, $shortlistVendorId, $material, $peralatan, $tenagaKerja);
             if (count($saveData)) {
-                //dd($saveData);
                 $generatePdf = $this->generatePdfService->generatePdfMaterial($saveData);
-                return $generatePdf;
+                $savePdf = $this->shortlistVendorService->saveUrlPdf($vendorId, $shortlistVendorId, $generatePdf);
+                if (isset($saveData)) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Data berhasil didapat!',
+                        'data' => $savePdf,
+                    ]);
+                }
             }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data!',
+                'error' => []
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -413,7 +425,7 @@ class PerencanaanDataController extends Controller
 
     public function getShortlistVendorSumberDaya(Request $request)
     {
-        $idInformasiUmum = $request->query('shortlist_vendor_id');
+        $idInformasiUmum = $request->query('informasi_umum_id');
         $idShortlistVendor = $request->query('id');
 
         $queryData = $this->shortlistVendorService->getIdentifikasiByShortlist($idShortlistVendor, $idInformasiUmum);
