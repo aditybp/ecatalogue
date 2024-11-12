@@ -6,8 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\UserService;
 use App\Services\LoginService;
-use Exception;
-use Tymon\JWTAuth\Facades\JWTAuth; 
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -16,17 +15,16 @@ class LoginController extends Controller
     protected $loginService;
 
     public function __construct(
-        UserService $userService, 
+        UserService $userService,
         LoginService $loginService
-        )
-    {
+    ) {
         $this->userService = $userService;
         $this->loginService = $loginService;
     }
 
     public function login(Request $request)
     {
-        
+
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string'
@@ -46,7 +44,7 @@ class LoginController extends Controller
             if (!auth('api')->attempt($credentials)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Gagal login!',    
+                    'message' => 'Gagal login!',
                     'error' => 'Invalid credentials'
                 ]);
             }
@@ -60,15 +58,13 @@ class LoginController extends Controller
                 'token' => $token,
                 'data' => $account
             ]);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal login!',    
+                'message' => 'Gagal login!',
                 'error' => $th->getMessage()
             ]);
         }
-        
     }
 
     public function logout()
@@ -89,5 +85,4 @@ class LoginController extends Controller
             'data' => Auth::user()
         ]);
     }
-    
 }
