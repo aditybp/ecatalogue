@@ -241,7 +241,7 @@ class PerencanaanDataController extends Controller
 
         return response()->json([
             'status' => 'error',
-            'message' => 'Data berhasil tidak dapat ditemukan!',
+            'message' => 'Data tidak dapat ditemukan!',
             'data' => []
         ]);
     }

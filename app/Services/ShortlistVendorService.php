@@ -13,17 +13,24 @@ class ShortlistVendorService
     private function getIdentifikasiKebutuhanByIdentifikasiId($id)
     {
         $getDataIdentifikasi = PerencanaanData::with([
-            'material:id,identifikasi_kebutuhan_id,nama_material',
-            'peralatan:id,identifikasi_kebutuhan_id,nama_peralatan',
+            'material:id,identifikasi_kebutuhan_id,nama_material,spesifikasi,ukuran',
+            'peralatan:id,identifikasi_kebutuhan_id,nama_peralatan,spesifikasi,kapasitas',
             'tenagaKerja:id,identifikasi_kebutuhan_id,jenis_tenaga_kerja'
         ])->select('identifikasi_kebutuhan_id')->where('identifikasi_kebutuhan_id', $id)
             ->get();
 
-
         $identifikasikebutuhan = $getDataIdentifikasi->flatMap(function ($item) {
 
-            $materials = $item->material->pluck('nama_material')->toArray();
-            $peralatans = $item->peralatan->pluck('nama_peralatan')->toArray();
+            //$materials = $item->material->pluck('nama_material')->toArray();
+            $materials = $item->material->map(function ($material) {
+                return "{$material->nama_material} {$material->spesifikasi} {$material->ukuran}";
+            })->toArray();
+
+            //$peralatans = $item->peralatan->pluck('nama_peralatan')->toArray();
+            $peralatans = $item->peralatan->map(function ($peralatan) {
+                return "{$peralatan->nama_peralatan} {$peralatan->spesifikasi} {$peralatan->kapasitas}";
+            })->toArray();
+
             $tenagaKerjas = $item->tenagaKerja->pluck('jenis_tenaga_kerja')->toArray();
 
             return array_merge($materials, $peralatans, $tenagaKerjas);
@@ -35,13 +42,13 @@ class ShortlistVendorService
     public function getDataVendor($id)
     {
         $resultArray = $this->getIdentifikasiKebutuhanByIdentifikasiId($id);
+        //dd($resultArray);
 
         $queryDataVendors = DataVendor::all();
 
-
         $dataVendors = [];
         foreach ($queryDataVendors as $value) {
-            $sumberDayaArray = explode(',', $value->sumber_daya);
+            $sumberDayaArray = explode(';', $value->sumber_daya);
 
             $resultElemination = $this->eleminationArray($resultArray, $sumberDayaArray);
             if (!empty($resultElemination)) {
@@ -147,7 +154,7 @@ class ShortlistVendorService
             'tenaga_kerja' => []
         ];
 
-        $sumberDaya = explode(',', $query['sumber_daya']);
+        $sumberDaya = explode(';', $query['sumber_daya']);
 
         foreach ($sumberDaya as $value) {
             if (count($query['material'])) {
