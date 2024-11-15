@@ -70,7 +70,7 @@ class PerencanaanDataController extends Controller
         if ($request->tipe_informasi_umum == 'manual') {
             $rules = array_merge($rules, [
                 'nama_balai' => 'required',
-                'tipologi' => 'required',
+                //'tipologi' => 'required',
             ]);
         }
 
@@ -420,8 +420,6 @@ class PerencanaanDataController extends Controller
             ]);
         }
     }
-
-    public function testIdentifikasi() {}
 
     public function getShortlistVendorSumberDaya(Request $request)
     {
