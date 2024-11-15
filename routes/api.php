@@ -51,6 +51,7 @@ Route::post('/input-vendor', [VendorController::class, 'inputVendor']);
 Route::post('/perencanaan-data/store-informasi-umum/', [PerencanaanDataController::class, 'storeInformasiUmumData']);
 Route::get('/perencanaan-data/informasi-umum/{id}', [PerencanaanDataController::class, 'getInformasiUmumByPerencanaanId']);
 Route::post('/perencanaan-data/store-identifikasi-kebutuhan', [PerencanaanDataController::class, 'storeIdentifikasiKebutuhan']);
+Route::get('/perencanaan-data/get-identifikasi-kebutuhan/{id}', [PerencanaanDataController::class, 'getIdentifikasiKebutuhanStored']);
 
 Route::get('/perencanaan-data/get-data-vendor/{id}', [PerencanaanDataController::class, 'getAllDataVendor']);
 Route::post('/perencanaan-data/store-shortlist-vendor', [PerencanaanDataController::class, 'selectDataVendor']);
