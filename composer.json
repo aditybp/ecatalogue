@@ -12,8 +12,9 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
+        "maatwebsite/excel": "^1.1",
         "php-open-source-saver/jwt-auth": "^2.2",
-        "setasign/fpdi-fpdf": "^2.3",
+        "phpoffice/phpspreadsheet": "^3.4",
         "tymon/jwt-auth": "*"
     },
     "require-dev": {

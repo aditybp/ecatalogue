@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\BalaiKerjaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -28,6 +29,9 @@ use Illuminate\Support\Facades\Mail;
 // });
 
 Route::get('/send-username/{id}', [AccountController::class, 'sendUsernameAndEmail']);
+
+Route::get('/get-balai-kerja', [BalaiKerjaController::class, 'getAllSatuanBalaiKerja']);
+Route::post('/store-balai-kerja', [BalaiKerjaController::class, 'storeSatuanBalaiKerja']);
 
 Route::post('/store-user', [UsersController::class, 'store']);
 Route::post('/login', [LoginController::class, 'login']);
