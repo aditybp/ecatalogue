@@ -9,9 +9,42 @@ use Illuminate\Support\Facades\Validator;
 class VendorController extends Controller
 {
 
-    public function allVendor()
+    public function getVendor($id)
     {
-        return DataVendor::all();
+        $vendor = DataVendor::find($id);
+
+        if ($vendor) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil didapat!',
+                'data' => $vendor
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mendapatkan data!',
+                'data' => []
+            ]);
+        }
+    }
+
+    public function getVendorAll()
+    {
+        $vendor = DataVendor::select('id', 'nama_vendor', 'alamat', 'no_telepon', 'nama_pic')->get();
+
+        if ($vendor) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil didapat!',
+                'data' => $vendor
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mendapatkan data!',
+                'data' => []
+            ]);
+        }
     }
 
     public function inputVendor(Request $request)
@@ -39,7 +72,7 @@ class VendorController extends Controller
                 'message' => 'Data Vendor berhasil disimpan',
                 'data' => $vendor
             ]);
-        } catch (\Throwable $th) {
+        } catch (\Exception $th) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal menyimpan data vendor',

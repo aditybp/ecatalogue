@@ -45,7 +45,8 @@ Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
-Route::get('/show-allvendor', [VendorController::class, 'allVendor']);
+Route::get('/get-vendor/{id}', [VendorController::class, 'getVendor']);
+Route::get('/get-vendor-all', [VendorController::class, 'getVendorAll']);
 Route::post('/input-vendor', [VendorController::class, 'inputVendor']);
 
 Route::post('/perencanaan-data/store-informasi-umum/', [PerencanaanDataController::class, 'storeInformasiUmumData']);
