@@ -160,7 +160,6 @@ class GeneratePdfService
         $savePath = public_path('kuisioner/' . $randomFileName);
         $pdf->Output('F', $savePath);
         $url = asset('kuisioner/' . $randomFileName);
-
         return $url;
     }
 
