@@ -49,8 +49,13 @@ class VendorController extends Controller
     public function inputVendor(Request $request)
     {
 
-
         try {
+
+            if ($request->hasFile('logo_url') && $request->hasFile('dok_pendukung_url')) {
+                $filePathLogo = $request->file('logo_url')->store('logo_vendor', 'public');
+                $filePathDokPendukung = $request->file('dok_pendukung_url')->store('doc_pendukung_vendor');
+            }
+
             $vendor = new DataVendor();
             $vendor->nama_vendor = $request->nama_vendor;
             $vendor->jenis_vendor_id = json_decode($request->jenis_vendor_id, true);
@@ -62,8 +67,8 @@ class VendorController extends Controller
             $vendor->provinsi_id = $request->provinsi_id;
             $vendor->kota_id = $request->kota_id;
             $vendor->koordinat = $request->koordinat;
-            $vendor->logo_url = $request->logo_url;
-            $vendor->dok_pendukung_url = $request->dok_pendukung_url;
+            $vendor->logo_url = $filePathLogo;
+            $vendor->dok_pendukung_url = $filePathDokPendukung;
             $vendor->sumber_daya = $request->sumber_daya;
             $vendor->save();
 

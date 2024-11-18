@@ -26,7 +26,8 @@ class UsersController extends Controller
             'nrp' => 'required|string|max:255',
             'satuan_kerja_id' => 'required',
             'balai_kerja_id' => 'required',
-            'no_handphone' => 'required|string'
+            'no_handphone' => 'required|string',
+            'surat_penugasan_url' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -47,13 +48,18 @@ class UsersController extends Controller
         }
 
         try {
+
+            if ($request->hasFile('surat_penugasan_url')) {
+                $filePath = $request->file('surat_penugasan_url')->store('sk_penugasan');
+            }
+
             $user = new users();
             $user->nama_lengkap = $request->nama_lengkap;
             $user->no_handphone = $request->no_handphone;
             $user->nik = $request->nik;
             $user->email = $request->email;
             $user->nrp = $request->nrp;
-            $user->surat_penugasan_url = $request->surat_penugasan_url;
+            $user->surat_penugasan_url = $filePath;
             $user->satuan_kerja_id = $request->satuan_kerja_id;
             $user->balai_kerja_id = $request->balai_kerja_id;
             $user->status = 'register';
@@ -70,14 +76,13 @@ class UsersController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal menyimpan pengguna',    
+                'message' => 'Gagal menyimpan pengguna',
                 'error' => $th->getMessage()
             ]);
         }
-        
     }
 
-    public function getUserById($id) 
+    public function getUserById($id)
     {
         try {
 
@@ -85,7 +90,7 @@ class UsersController extends Controller
             if (is_null($getUser)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'data dengan id '. $id .' tidak ditemukan!',
+                    'message' => 'data dengan id ' . $id . ' tidak ditemukan!',
                     'data' => []
                 ]);
             }
