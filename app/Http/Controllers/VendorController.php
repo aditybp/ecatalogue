@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\DataVendor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class VendorController extends Controller
 {
@@ -49,6 +48,7 @@ class VendorController extends Controller
 
     public function inputVendor(Request $request)
     {
+
 
         try {
             $vendor = new DataVendor();
