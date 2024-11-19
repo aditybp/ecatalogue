@@ -32,4 +32,14 @@ class Peralatan extends Model
     {
         return $this->belongsTo(ShortlistVendor::class, 'identifikasi_kebutuhan_id', 'shortlist_vendor_id');
     }
+
+    public function provinces()
+    {
+        return $this->belongsTo(Provinces::class, 'provincies_id');
+    }
+
+    public function cities()
+    {
+        return $this->belongsTo(Cities::class, 'cities_id');
+    }
 }

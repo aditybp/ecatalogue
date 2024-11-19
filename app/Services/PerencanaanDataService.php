@@ -8,8 +8,18 @@ class PerencanaanDataService
 {
     public function listAllPerencanaanData($id)
     {
-        $query = PerencanaanData::with(['informasiUmum', 'material', 'peralatan', 'tenagaKerja', 'shortlistVendor'])
-        ->where('informasi_umum_id', $id)->first();
+        $query = PerencanaanData::with([
+            'informasiUmum',
+            'material.provinces',
+            'material.cities',
+            'peralatan.provinces',
+            'peralatan.cities',
+            'tenagaKerja.provinces',
+            'tenagaKerja.cities',
+            'shortlistVendor'
+        ])
+            ->where('informasi_umum_id', $id)->first();
+
         return $query;
     }
 
@@ -29,5 +39,4 @@ class PerencanaanDataService
         $perencanaanData->save();
         return true;
     }
-
 }
