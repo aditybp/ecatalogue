@@ -85,15 +85,24 @@ class ShortlistVendorService
     {
         //$makeKuisioner = app(GeneratePdfService::class)->generatePdfMaterialNatural($data['data_vendor_id']);
 
-        $shortlistVendor = new ShortlistVendor();
-        $shortlistVendor->data_vendor_id = $data['data_vendor_id'];
-        $shortlistVendor->shortlist_vendor_id = $shortlistVendorId;
-        $shortlistVendor->nama_vendor = $data['nama_vendor'];
-        $shortlistVendor->pemilik_vendor = $data['pemilik_vendor'];
-        $shortlistVendor->alamat = $data['alamat'];
-        $shortlistVendor->kontak = $data['kontak'];
-        $shortlistVendor->sumber_daya = $data['sumber_daya'];
-        $shortlistVendor->save();
+        $shortlistVendorArray = [
+            'data_vendor_id' => $data['data_vendor_id'],
+            'shortlist_vendor_id' => $shortlistVendorId,
+            'nama_vendor' => $data['nama_vendor'],
+            'pemilik_vendor' => $data['pemilik_vendor'],
+            'alamat' => $data['alamat'],
+            'kontak' => $data['kontak'],
+            'sumber_daya' => $data['sumber_daya']
+        ];
+
+        $shortlistVendor = ShortlistVendor::updateOrCreate(
+            [
+                'data_vendor_id' => $data['data_vendor_id'],
+                'shortlist_vendor_id' => $shortlistVendorId
+            ],
+            $shortlistVendorArray
+        );
+
         return $shortlistVendor->toArray();
     }
 
