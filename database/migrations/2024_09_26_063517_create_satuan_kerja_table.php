@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('satuan_kerja', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->timestamp('created_at')->nullable(); 
-            $table->timestamp('edited_at')->nullable(); 
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
             $table->timestamp('deleted_at')->nullable();
         });
     }
