@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\SatuanBalaiKerja;
+use App\Models\SatuanKerja;
 use App\Models\Unor;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -54,11 +55,17 @@ class importExcelData extends Command
                     $data[] = $value->getValue();
                 }
 
-                if (!empty($data[0]) && !empty($data[1])) {
-                    SatuanBalaiKerja::create([
+                if ($filePath == 'resources/excel/satuan_kerja.xlsx') {
+                    SatuanKerja::create([
                         'nama' => $data[0],
-                        'unor_id' => $data[1]
                     ]);
+                } else {
+                    if (!empty($data[0]) && !empty($data[1])) {
+                        SatuanBalaiKerja::create([
+                            'nama' => $data[0],
+                            'unor_id' => $data[1]
+                        ]);
+                    }
                 }
             }
 

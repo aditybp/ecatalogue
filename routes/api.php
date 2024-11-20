@@ -10,7 +10,9 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PerencanaanDataController;
 use App\Http\Controllers\ProvinceAndCitiesController;
+use App\Http\Controllers\SatuanKerjaController;
 use App\Http\Controllers\VendorController;
+use App\Models\SatuanBalaiKerja;
 use Illuminate\Support\Facades\Mail;
 
 /*
@@ -59,6 +61,9 @@ Route::post('/perencanaan-data/store-shortlist-vendor', [PerencanaanDataControll
 Route::get('/perencanaan-data/perencanaan-data-result', [PerencanaanDataController::class, 'perencanaanDataResult']);
 Route::get('/perencanaan-data/shortlist-detail-identifikasi', [PerencanaanDataController::class, 'getShortlistVendorSumberDaya']);
 Route::post('/perencanaan-data/adjust-identifikasi-kebutuhan', [PerencanaanDataController::class, 'adjustShortlistVendor']);
+
+Route::get('/get-satuan-kerja', [SatuanKerjaController::class, 'getAllSatuanKerja']);
+Route::post('/store-satuan-kerja', [SatuanKerjaController::class, 'storeSatuanKerja']);
 
 Route::get('/test-email', function () {
     Mail::raw('This is a test email', function ($message) {
