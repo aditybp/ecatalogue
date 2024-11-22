@@ -7,11 +7,12 @@ use App\Models\PerencanaanData;
 
 class InformasiUmumService
 {
-    public function getDataInformasiUmumById($informasiUmumId) {
+    public function getDataInformasiUmumById($informasiUmumId)
+    {
         return InformasiUmum::find($informasiUmumId);
     }
 
-    public function checkNamaPaket($namaPaket) 
+    public function checkNamaPaket($namaPaket)
     {
         return InformasiUmum::where('nama_paket', $namaPaket)->exists();
     }
@@ -24,7 +25,7 @@ class InformasiUmumService
         $informasiUmum->nama_ppk = $dataInformasiUmum->nama_ppk;
         $informasiUmum->jabatan_ppk = $dataInformasiUmum->jabatan_ppk;
         $informasiUmum->jenis_informasi = $dataInformasiUmum->tipe_informasi_umum;
-        
+
         if ($dataInformasiUmum->tipe_informasi_umum == 'manual') {
             $informasiUmum->nama_balai = $dataInformasiUmum->nama_balai;
             //$informasiUmum->tipologi = $dataInformasiUmum->tipologi;
@@ -49,20 +50,17 @@ class InformasiUmumService
 
     public function getInformasiUmumByPerencanaanId($id)
     {
-        // $informasiUmum = InformasiUmum::with('perencanaanData')
-        // ->select('kode_rup', 'nama_paket')
-        // ->get();
-
         return InformasiUmum::with('perencanaanData')
-                ->select(
-                    'kode_rup',
-                    'nama_paket',
-                    'nama_ppk',
-                    'jabatan_ppk',
-                    'nama_balai',
-                    'tipologi',
-                    'jenis_informasi'
-                )->get()->first();
+            ->select(
+                'kode_rup',
+                'nama_paket',
+                'nama_ppk',
+                'jabatan_ppk',
+                'nama_balai',
+                'tipologi',
+                'jenis_informasi'
+            )
+            ->where('id', $id)
+            ->get()->first();
     }
-    
 }
