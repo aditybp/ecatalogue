@@ -62,7 +62,6 @@ class PerencanaanDataController extends Controller
     {
         $rules = [
             'tipe_informasi_umum' => 'required',
-            'kode_rup' => 'required',
             'nama_paket' => 'required',
             'nama_ppk' => 'required',
             'jabatan_ppk' => 'required',
