@@ -42,4 +42,9 @@ class DataVendor extends Model
     {
         return $this->hasMany(ShortlistVendor::class, 'data_vendor_id', 'id');
     }
+
+    public function kategori_vendor()
+    {
+        return $this->belongsTo(KategoriVendor::class, 'kategori_vendors_id', 'id');
+    }
 }

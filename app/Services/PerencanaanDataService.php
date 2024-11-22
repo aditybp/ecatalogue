@@ -20,7 +20,42 @@ class PerencanaanDataService
         ])
             ->where('informasi_umum_id', $id)->first();
 
-        return $query;
+        if ($query) {
+            $query->material = $query->material->map(function ($item) {
+                $item->provinsi = $item->provinces ? $item->provinces->nama_provinsi : null;
+                $item->kota = $item->cities ? $item->cities->nama_kota : null;
+                unset($item->provinces, $item->cities);
+                return $item;
+            });
+
+            $query->tenagaKerja = $query->tenagaKerja->map(function ($item) {
+                $item->provinsi = $item->provinces ? $item->provinces->nama_provinsi : null;
+                $item->kota = $item->cities ? $item->cities->nama_kota : null;
+                unset($item->provinces, $item->cities);
+                return $item;
+            });
+
+            $query->peralatan = $query->peralatan->map(function ($item) {
+                $item->provinsi = $item->provinces ? $item->provinces->nama_provinsi : null;
+                $item->kota = $item->cities ? $item->cities->nama_kota : null;
+                unset($item->provinces, $item->cities);
+                return $item;
+            });
+
+            $response = [
+                'id' => $query->id,
+                'informasi_umum_id' => $query->informasi_umum_id,
+                'identifikasi_kebutuhan_id' => $query->identifikasi_kebutuhan_id,
+                'shortlist_vendor_id' => $query->shortlist_vendor_id,
+                'informasi_umum' => $query->informasiUmum,
+                'material' => $query->material,
+                'peralatan' => $query->peralatan,
+                'tenagaKerja' => $query->tenagaKerja,
+                'shortlist_vendor' => $query->shortlistVendor,
+            ];
+        }
+
+        return $response;
     }
 
     public function updatePerencanaanData($informasiUmumId, $field, $value)

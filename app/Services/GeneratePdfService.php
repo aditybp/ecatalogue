@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Codedge\Fpdf\Fpdf\Fpdf;
 use App\Models\DataVendor;
+use App\Models\KategoriVendor;
 use App\Models\Material;
 use App\Models\Peralatan;
 use App\Models\ShortlistVendor;
@@ -21,6 +22,11 @@ class GeneratePdfService
     {
         $pdfFiles = [];
         $dataVendor = $this->getVendorById($data['vendor_id']);
+        $kategoriVendor = KategoriVendor::whereIn('id', $dataVendor['kategori_vendor_id'])
+            ->select('nama_kategori_vendor as name')
+            ->get();
+        $stringKategoriVendor = $kategoriVendor->pluck('name')->implode(', ');
+        $dataVendor['string_kategori_vendor'] = $stringKategoriVendor;
 
         if (!isset($dataVendor)) {
             throw new \Exception('data not found');
@@ -46,7 +52,8 @@ class GeneratePdfService
 
     private function getVendorById($id)
     {
-        return DataVendor::with(['provinces', 'cities'])->find($id);
+        return DataVendor::with(['provinces', 'cities', 'kategori_vendor'])
+            ->find($id);
     }
 
     private function getIdentifikasi($id, $category)
@@ -79,10 +86,25 @@ class GeneratePdfService
 
         $pdfInformasiUmum = $this->materialPdfInformasiUmum($templatePath, $dataVendor);
         $pdfIdentifikasi = $this->materialPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
+        $catatanKuisoner = $this->catatankuisonerPdf();
 
-        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi);
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi, $catatanKuisoner);
 
         return $pdfTempPath;
+    }
+
+    private function catatankuisonerPdf()
+    {
+        $pdf = new Fpdf();
+        $pdf->AddPage('L');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Image('views/pdf/catatan_kuisoner.jpg', 0, 0, 297, 210);
+
+        $tempFIlePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFIlePath);
+        $pdfFiles[] = $tempFIlePath;
+
+        return $pdfFiles;
     }
 
     private function materialPdfIdentifikasi($templatePath, $data)
@@ -225,7 +247,7 @@ class GeneratePdfService
         $geoTagging = $dataVendor['koordinat'];
         $telepon = $dataVendor['no_telepon'];
         $email = '-';
-        $kategoriResponden = '-';
+        $kategoriResponden = $dataVendor['string_kategori_vendor'];
         $idProvinsi = $dataVendor->cities->provinsi_id;
         $idKabupatenKota = $dataVendor->cities->kode_kota;
 
@@ -297,8 +319,9 @@ class GeneratePdfService
 
         $pdfInformasiUmum = $this->pdfPeralatanInformasiUmum($templatePath, $dataVendor);
         $pdfIdentifikasi = $this->peralatanPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
+        $catatanKuisoner = $this->catatankuisonerPdf();
 
-        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi);
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi, $catatanKuisoner);
 
         return $pdfTempPath;
     }
@@ -318,8 +341,9 @@ class GeneratePdfService
 
         $pdfInformasiUmum = $this->pdfPeralatanInformasiUmum($templatePath, $dataVendor);
         $pdfIdentifikasi = $this->tenagaKerjaPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
+        $catatanKuisoner = $this->catatankuisonerPdf();
 
-        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi);
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi, $catatanKuisoner);
 
         return $pdfTempPath;
     }
@@ -333,7 +357,7 @@ class GeneratePdfService
         $geoTagging = $dataVendor['koordinat'];
         $telepon = $dataVendor['no_telepon'];
         $email = '-';
-        $kategoriResponden = '-';
+        $kategoriResponden = $dataVendor['string_kategori_vendor'];
         $idProvinsi = $dataVendor->cities->provinsi_id;
         $idKabupatenKota = $dataVendor->cities->kode_kota;
 
