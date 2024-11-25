@@ -19,22 +19,23 @@ class InformasiUmumService
 
     public function saveInformasiUmum($dataInformasiUmum)
     {
-        $informasiUmum = new InformasiUmum();
-        $informasiUmum->kode_rup = $dataInformasiUmum->kode_rup;
-        $informasiUmum->nama_paket = $dataInformasiUmum->nama_paket;
-        $informasiUmum->nama_ppk = $dataInformasiUmum->nama_ppk;
-        $informasiUmum->jabatan_ppk = $dataInformasiUmum->jabatan_ppk;
-        $informasiUmum->jenis_informasi = $dataInformasiUmum->tipe_informasi_umum;
+        $informasiUmum = InformasiUmum::updateOrCreate(
+            [
+                'nama_paket' => $dataInformasiUmum->nama_paket,
+            ],
+            [
+                'kode_rup' => $dataInformasiUmum->kode_rup == null ? '' : $dataInformasiUmum->kode_rup,
+                'nama_paket' => $dataInformasiUmum->nama_paket,
+                'jabatan_ppk' => $dataInformasiUmum->jabatan_ppk,
+                'jenis_informasi' => $dataInformasiUmum->tipe_informasi_umum,
+                'nama_balai' => $dataInformasiUmum->tipe_informasi_umum == 'manual' ? $dataInformasiUmum->nama_balai : null,
+                'tipologi' => $dataInformasiUmum->tipologi == null ? '' : $dataInformasiUmum->tipologi, // Uncomment if needed
+            ]
+        );
 
-        if ($dataInformasiUmum->tipe_informasi_umum == 'manual') {
-            $informasiUmum->nama_balai = $dataInformasiUmum->nama_balai;
-            //$informasiUmum->tipologi = $dataInformasiUmum->tipologi;
-        }
-
-        $data = $informasiUmum->save();
         $informasiUmumId = $informasiUmum->id;
         $savePrencanaanData = $this->savePerencanaanData($informasiUmumId, 'informasi_umum_id');
-        if (!$data && !$savePrencanaanData) {
+        if (!$informasiUmum && !$savePrencanaanData) {
             return false;
         }
 
@@ -43,9 +44,12 @@ class InformasiUmumService
 
     private function savePerencanaanData($id, $namaField)
     {
-        $perencanaanData = new PerencanaanData();
-        $perencanaanData->$namaField = $id;
-        return $perencanaanData->save();
+        $data = PerencanaanData::updateOrCreate(
+            [
+                $namaField => $id,
+            ]
+        );
+        return $data;
     }
 
     public function getInformasiUmumByPerencanaanId($id)

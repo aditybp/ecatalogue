@@ -60,18 +60,23 @@ class PerencanaanDataService
 
     public function updatePerencanaanData($informasiUmumId, $field, $value)
     {
-        $perencanaanData = PerencanaanData::where('informasi_umum_id', $informasiUmumId)->first();
-        if (!$perencanaanData) {
+        $valueToUpdate = [];
+
+        if ($field == 'identifikasi_kebutuhan') {
+            $valueToUpdate['identifikasi_kebutuhan_id'] = $value;
+        } elseif ($field == 'shortlist_vendor') {
+            $valueToUpdate['shortlist_vendor_id'] = $value;
+        } else {
             return false;
         }
 
-        if ($field == 'identifikasi_kebutuhan') {
-            $perencanaanData->identifikasi_kebutuhan_id = $value;
-        } elseif ($field == 'shortlist_vendor') {
-            $perencanaanData->shortlist_vendor_id = $value;
-        }
+        PerencanaanData::updateOrCreate(
+            [
+                'informasi_umum_id' => $informasiUmumId,
+            ],
+            $valueToUpdate
+        );
 
-        $perencanaanData->save();
         return true;
     }
 }

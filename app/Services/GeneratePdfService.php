@@ -98,7 +98,7 @@ class GeneratePdfService
         $pdf = new Fpdf();
         $pdf->AddPage('L');
         $pdf->SetFont('Arial', 'B', 6);
-        $pdf->Image('views/pdf/catatan_kuisoner.jpg', 0, 0, 297, 210);
+        $pdf->Image(resource_path('views/pdf/catatan_kuisoner.jpg'), 0, 0, 297, 210);
 
         $tempFIlePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
         $pdf->Output('F', $tempFIlePath);
@@ -304,7 +304,7 @@ class GeneratePdfService
         return $pdfFiles;
     }
 
-    private function pdfPeralatan($id, $dataVendor)
+    private function pdfPeralatan($dataVendor, $id)
     {
         $pdfTempPath = [];
 
