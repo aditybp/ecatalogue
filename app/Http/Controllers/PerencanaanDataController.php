@@ -82,14 +82,14 @@ class PerencanaanDataController extends Controller
             ]);
         }
 
-        $checkNamaPaket = $this->informasiUmumService->checkNamaPaket($request->nama_paket);
-        if ($checkNamaPaket) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'paket ' . $request->nama_paket . ' sudah / sedang diproses!',
-                'data' => []
-            ]);
-        }
+        // $checkNamaPaket = $this->informasiUmumService->checkNamaPaket($request->nama_paket);
+        // if ($checkNamaPaket) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'paket ' . $request->nama_paket . ' sudah / sedang diproses!',
+        //         'data' => []
+        //     ]);
+        // }
 
         try {
             $saveInformasiUmum = $this->informasiUmumService->saveInformasiUmum($request);
@@ -396,9 +396,9 @@ class PerencanaanDataController extends Controller
                 'status' => 'success',
                 'message' => 'Data berhasil didapat!',
                 'data' => [
-                    'material' => $perencanaanData->material,
-                    'peralatan' => $perencanaanData->peralatan,
-                    'tenaga_kerja' => $perencanaanData->tenagaKerja,
+                    'material' => $perencanaanData['material'],
+                    'peralatan' => $perencanaanData['peralatan'],
+                    'tenaga_kerja' => $perencanaanData['tenagaKerja'],
                 ]
             ]);
         } else {

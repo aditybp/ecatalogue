@@ -35,11 +35,11 @@ class Material extends Model
 
     public function provinces()
     {
-        return $this->belongsTo(Provinces::class, 'provincies_id');
+        return $this->belongsTo(Provinces::class, 'provincies_id', 'kode_provinsi');
     }
 
     public function cities()
     {
-        return $this->belongsTo(Cities::class, 'cities_id');
+        return $this->belongsTo(Cities::class, 'cities_id', 'kode_kota');
     }
 }
