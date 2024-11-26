@@ -79,4 +79,27 @@ class PerencanaanDataService
 
         return true;
     }
+
+    public function changeStatusPerencanaanData($status, $informasiUmumId)
+    {
+        $dataSave = PerencanaanData::where('informasi_umum_id', $informasiUmumId)
+            ->update(['status' => $status]);
+
+        return $dataSave > 0;
+    }
+
+    public function tableListPerencanaanData($status)
+    {
+        return PerencanaanData::join('informasi_umum', 'perencanaan_data.informasi_umum_id', '=', 'informasi_umum.id')
+            ->whereIn('perencanaan_data.status', $status)
+            ->get([
+                'perencanaan_data.id',
+                'perencanaan_data.status',
+                'informasi_umum.nama_paket',
+                'informasi_umum.nama_balai',
+                'informasi_umum.nama_ppk',
+                'informasi_umum.jabatan_ppk',
+                'informasi_umum.kode_rup'
+            ]);
+    }
 }
