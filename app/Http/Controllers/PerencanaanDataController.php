@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PerencanaanData;
 use App\Models\ShortlistVendor;
 use App\Models\TenagaKerja;
 use Illuminate\Http\Request;
@@ -100,6 +101,8 @@ class PerencanaanDataController extends Controller
                     'data' => []
                 ]);
             }
+            //change status
+            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.IDENTIFIKASI_KEBUTUHAN'), $saveInformasiUmum['id']);
 
             return response()->json([
                 'status' => 'success',
@@ -162,6 +165,7 @@ class PerencanaanDataController extends Controller
 
             //update to perencanaan_data table
             $this->perencanaanDataService->updatePerencanaanData($identifikasiKebutuhanId, 'identifikasi_kebutuhan', $identifikasiKebutuhanId);
+            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.SHORTLIST_VENDOR'), $identifikasiKebutuhanId);
 
             return response()->json([
                 'status' => 'success',
@@ -227,6 +231,7 @@ class PerencanaanDataController extends Controller
             }
 
             $this->perencanaanDataService->updatePerencanaanData($shortlistVendorId, 'shortlist_vendor', $shortlistVendorId);
+            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.PERANCANGAN_KUESIONER'), $shortlistVendorId);
 
             return response()->json([
                 'status' => 'success',
@@ -394,7 +399,7 @@ class PerencanaanDataController extends Controller
         if (!empty($perencanaanData)) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Data berhasil didapat!',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
                 'data' => [
                     'material' => $perencanaanData['material'],
                     'peralatan' => $perencanaanData['peralatan'],
@@ -404,8 +409,53 @@ class PerencanaanDataController extends Controller
         } else {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal mendapatkan data!',
-                'error' => []
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
+            ]);
+        }
+    }
+
+    public function changeStatusPerencanaan($informasiUmumId)
+    {
+        try {
+            $changeStatus = $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.SELESAI_PERENCANAAN'), $informasiUmumId);
+
+            if ($changeStatus) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => config('constants.SUCCESS_MESSAGE_SAVE'),
+                    'data' => $changeStatus
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_SAVE'),
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function tableListPerencanaan()
+    {
+        $status = [
+            config('constants.SELESAI_PERENCANAAN'),
+            config('constants.IDENTIFIKASI_KEBUTUHAN'),
+            config('constants.SHORTLIST_VENDOR'),
+            config('constants.PERANCANGAN_KUESIONER'),
+        ];
+        $list = $this->perencanaanDataService->tableListPerencanaanData($status);
+        if (isset($list)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
+                'data' => $list
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
             ]);
         }
     }

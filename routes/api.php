@@ -61,6 +61,8 @@ Route::post('/perencanaan-data/store-shortlist-vendor', [PerencanaanDataControll
 Route::get('/perencanaan-data/perencanaan-data-result', [PerencanaanDataController::class, 'perencanaanDataResult']);
 Route::get('/perencanaan-data/shortlist-detail-identifikasi', [PerencanaanDataController::class, 'getShortlistVendorSumberDaya']);
 Route::post('/perencanaan-data/adjust-identifikasi-kebutuhan', [PerencanaanDataController::class, 'adjustShortlistVendor']);
+Route::post('/perencanaan-data/save-perencanaan-data/{id}', [PerencanaanDataController::class, 'changeStatusPerencanaan']);
+Route::get('/perencanaan-data/table-list-prencanaan-data', [PerencanaanDataController::class, 'tableListPerencanaan']);
 
 Route::get('/get-satuan-kerja', [SatuanKerjaController::class, 'getAllSatuanKerja']);
 Route::post('/store-satuan-kerja', [SatuanKerjaController::class, 'storeSatuanKerja']);
