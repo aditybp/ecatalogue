@@ -91,7 +91,7 @@ class PerencanaanDataService
     public function tableListPerencanaanData($status)
     {
         return PerencanaanData::join('informasi_umum', 'perencanaan_data.informasi_umum_id', '=', 'informasi_umum.id')
-            ->whereIn('perencanaan_data.status', $status)
+            ->where('perencanaan_data.status', $status)
             ->get([
                 'perencanaan_data.id',
                 'perencanaan_data.status',

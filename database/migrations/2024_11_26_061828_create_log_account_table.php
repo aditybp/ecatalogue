@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('team_pengumpulan_data', function (Blueprint $table) {
+        Schema::create('log_account', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_team')->nullable();
-            $table->string('nama_ketua')->nullable();
-            $table->string('nama_sekretaris')->nullable();
-            $table->string('nama_anggota')->nullable();
-            $table->string('url_sk_penugasan')->nullable();
+            $table->unsignedBigInteger('user_id');
+            $table->text('action');
+            $table->string('ip_address');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('deleted_at')->nullable();
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('team_pengumpulan_data');
+        Schema::dropIfExists('log_account');
     }
 };

@@ -6,9 +6,7 @@ return [
     'ERROR_MESSAGE_GET' => 'Gagal Mendapatkan Data',
     'ERROR_MESSAGE_SAVE' => 'Gagal Menyimpan Data',
 
-    'SELESAI_PERENCANAAN' => 'Selesai Tahap Perencanaan Data',
-    'IDENTIFIKASI_KEBUTUHAN' => 'Proses Pengisian Identifikasi Kebutuhan',
-    'SHORTLIST_VENDOR' => 'Proses Pengisian Shortlist Vendor',
-    'PERANCANGAN_KUESIONER' => 'Proses Pengisian Perancangan Kuesioner',
-    'PENUGASAN_PENGAWAS' => 'Penugasan Team Pengawas',
+    'STATUS_PERENCANAAN' => 'Proses Perencanaan Data',
+
+    'STATUS_PENGUMPULAN' => 'Pengumpulan Data',
 ];

@@ -13,9 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('perencanaan_data', function (Blueprint $table) {
-            $table->string('status')->nullable();
-            $table->unsignedBigInteger('petugas_lapangan_id')->nullable();
+        Schema::create('pengawas', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('sk_penugasan');
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
@@ -26,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('perencanaan_data', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('pengawas');
     }
 };

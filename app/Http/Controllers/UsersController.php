@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Roles;
 use App\Models\users;
 use App\Services\UserService;
 use Illuminate\Auth\Events\Registered;
@@ -107,5 +108,15 @@ class UsersController extends Controller
                 'data' => []
             ]);
         }
+    }
+
+    public function listRole()
+    {
+        $getRole = Roles::select('id', 'nama')->get();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'berhasil menampilkan data',
+            'data' => $getRole
+        ]);
     }
 }

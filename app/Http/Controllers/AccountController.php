@@ -6,9 +6,12 @@ use App\Mail\SendUsernameAndPassword;
 use App\Services\UserService;
 use App\Services\LoginService;
 use App\Models\Accounts;
+use App\Models\Users;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 
@@ -25,14 +28,28 @@ class AccountController extends Controller
         $this->loginService = $loginService;
     }
 
-    public function sendUsernameAndEmail($userId)
+    public function sendUsernameAndEmail(Request $request)
     {
-        $checkUserId = $this->userService->checkUserIfExist($userId);
+        $rules = [
+            'user_id' => 'required',
+            'role_id' => 'required'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'validasi gagal!',
+                'data' => []
+            ]);
+        }
+
+        $checkUserId = $this->userService->checkUserIfExist($request['user_id']);
 
         if (!$checkUserId) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'user id ' . $userId . ' tidak dapat ditemukan!',
+                'message' => 'user id ' . $request['user_id'] . ' tidak dapat ditemukan!',
                 'data' => []
             ]);
         }
@@ -46,19 +63,27 @@ class AccountController extends Controller
                 'password' =>  Hash::make($generatePassword),
             ]);
 
-            Mail::to($checkUserId['email'])->send(new SendUsernameAndPassword($checkUserId['email'], $generatePassword));
+            $dataUser = Users::where('id', $request['user_id'])
+                ->update([
+                    'id_roles' => $request['role_id'],
+                    'status' => 'active',
+                ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Accounts berhasil disimpan',
-                'data' => $accounts,
-                'debug' => $generatePassword
-            ]);
+            if ($accounts && $dataUser) {
+
+                Mail::to($checkUserId['email'])->send(new SendUsernameAndPassword($checkUserId['email'], $generatePassword));
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Accounts berhasil disimpan',
+                    'data' => $accounts
+                ]);
+            }
         } catch (Exception $th) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal menyimpan accounts!',
-                'error' => $th
+                'error' => $th->getMessage()
             ]);
         }
     }
