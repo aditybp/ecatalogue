@@ -8,10 +8,12 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\PengumpulanDataController;
 use App\Http\Controllers\PerencanaanDataController;
 use App\Http\Controllers\ProvinceAndCitiesController;
 use App\Http\Controllers\SatuanKerjaController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\KuisionerController;
 use App\Models\SatuanBalaiKerja;
 use Illuminate\Support\Facades\Mail;
 
@@ -30,7 +32,8 @@ use Illuminate\Support\Facades\Mail;
 //     return $request->user();
 // });
 
-Route::get('/send-username/{id}', [AccountController::class, 'sendUsernameAndEmail']);
+Route::post('/send-username', [AccountController::class, 'sendUsernameAndEmail']);
+Route::get('/list-role', [UsersController::class, 'listRole']);
 
 Route::get('/get-balai-kerja', [BalaiKerjaController::class, 'getAllSatuanBalaiKerja']);
 Route::post('/store-balai-kerja', [BalaiKerjaController::class, 'storeSatuanBalaiKerja']);
@@ -63,6 +66,7 @@ Route::get('/perencanaan-data/shortlist-detail-identifikasi', [PerencanaanDataCo
 Route::post('/perencanaan-data/adjust-identifikasi-kebutuhan', [PerencanaanDataController::class, 'adjustShortlistVendor']);
 Route::post('/perencanaan-data/save-perencanaan-data/{id}', [PerencanaanDataController::class, 'changeStatusPerencanaan']);
 Route::get('/perencanaan-data/table-list-prencanaan-data', [PerencanaanDataController::class, 'tableListPerencanaan']);
+Route::get('/perencanaan-data/get-kuisioner/{id}', [KuisionerController::class, 'getKuisionerByPerencanaanDataId']);
 
 Route::get('/get-satuan-kerja', [SatuanKerjaController::class, 'getAllSatuanKerja']);
 Route::post('/store-satuan-kerja', [SatuanKerjaController::class, 'storeSatuanKerja']);
@@ -81,3 +85,22 @@ Route::get('/password/reset/{token}', function ($token) {
 })->name('password.reset');
 
 Route::get('/provinces-and-cities', [ProvinceAndCitiesController::class, 'getProvinceAndCities']);
+
+Route::get('/pengumpulan-data/get-team-pengumpulan', [PengumpulanDataController::class, 'getTeamPengumpulanData']);
+Route::post('/pengumpulan-data/assign-team-pengumpulan', [PengumpulanDataController::class, 'assignTeamPengumpulanData']);
+Route::post('/pengumpulan-data/store-team-teknis', [PengumpulanDataController::class, 'storeTeamTeknisBalai']);
+
+Route::get('/pengumpulan-data/table-list-pengumpulan', [PengumpulanDataController::class, 'listPengumpulanData']);
+Route::get('/pengumpulan-data/list-user', [PengumpulanDataController::class, 'listUser']);
+
+Route::post('/pengumpulan-data/store-pengawas', [PengumpulanDataController::class, 'storePengawas']);
+Route::post('/pengumpulan-data/store-petugas-lapangan', [PengumpulanDataController::class, 'storePetugasLapangan']);
+Route::post('/pengumpulan-data/store-pengolah-data', [PengumpulanDataController::class, 'storepengolahData']);
+
+Route::get('/pengumpulan-data/list-pengawas', [PengumpulanDataController::class, 'listPengawas']);
+Route::get('/pengumpulan-data/list-pengolah-data', [PengumpulanDataController::class, 'listPengolahData']);
+Route::get('/pengumpulan-data/list-petugas-lapangan', [PengumpulanDataController::class, 'listPetugasLapangan']);
+
+Route::post('/pengumpulan-data/assign-pengawas', [PengumpulanDataController::class, 'assignPengawas']);
+Route::post('/pengumpulan-data/assign-pengolah-data', [PengumpulanDataController::class, 'assignPengolahData']);
+Route::post('/pengumpulan-data/assign-petugas-lapangan', [PengumpulanDataController::class, 'assignPetugasLapangan']);

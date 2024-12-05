@@ -29,7 +29,8 @@ class InformasiUmumService
                 'jabatan_ppk' => $dataInformasiUmum->jabatan_ppk,
                 'jenis_informasi' => $dataInformasiUmum->tipe_informasi_umum,
                 'nama_balai' => $dataInformasiUmum->tipe_informasi_umum == 'manual' ? $dataInformasiUmum->nama_balai : null,
-                'tipologi' => $dataInformasiUmum->tipologi == null ? '' : $dataInformasiUmum->tipologi, // Uncomment if needed
+                'tipologi' => $dataInformasiUmum->tipologi == null ? '' : $dataInformasiUmum->tipologi,
+                'nama_ppk' => $dataInformasiUmum->nama_ppk,
             ]
         );
 

@@ -5,17 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PetugasLapangan extends Model
+class LogAccount extends Model
 {
     use HasFactory;
-    protected $table = 'petugas_lapangan';
+
+    protected $table = 'log_account';
     protected $fillable = [
         'user_id',
-        'sk_penugasan'
+        'action',
+        'ip_address'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(Users::class);
-    }
 }

@@ -15,7 +15,9 @@ class PerencanaanData extends Model
         'identifikasi_kebutuhan_id',
         'shortlist_vendor_id',
         'status',
-        'petugas_lapangan_id'
+        'petugas_lapangan_id',
+        'pengawas_id',
+        'pengolah_data_id'
     ];
 
     public function informasiUmum()

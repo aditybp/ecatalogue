@@ -18,4 +18,9 @@ class Users extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function satuanKerja()
+    {
+        return $this->belongsTo(SatuanKerja::class, 'satuan_kerja_id');
+    }
 }

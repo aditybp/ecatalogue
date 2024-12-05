@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PerencanaanData;
-use App\Models\ShortlistVendor;
-use App\Models\TenagaKerja;
 use Illuminate\Http\Request;
 use App\Services\InformasiUmumService;
 use App\Services\IdentifikasiKebutuhanService;
@@ -102,7 +99,7 @@ class PerencanaanDataController extends Controller
                 ]);
             }
             //change status
-            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.IDENTIFIKASI_KEBUTUHAN'), $saveInformasiUmum['id']);
+            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.STATUS_PERENCANAAN'), $saveInformasiUmum['id']);
 
             return response()->json([
                 'status' => 'success',
@@ -165,7 +162,7 @@ class PerencanaanDataController extends Controller
 
             //update to perencanaan_data table
             $this->perencanaanDataService->updatePerencanaanData($identifikasiKebutuhanId, 'identifikasi_kebutuhan', $identifikasiKebutuhanId);
-            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.SHORTLIST_VENDOR'), $identifikasiKebutuhanId);
+            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.STATUS_PERENCANAAN'), $identifikasiKebutuhanId);
 
             return response()->json([
                 'status' => 'success',
@@ -231,7 +228,7 @@ class PerencanaanDataController extends Controller
             }
 
             $this->perencanaanDataService->updatePerencanaanData($shortlistVendorId, 'shortlist_vendor', $shortlistVendorId);
-            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.PERANCANGAN_KUESIONER'), $shortlistVendorId);
+            $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.STATUS_PERENCANAAN'), $shortlistVendorId);
 
             return response()->json([
                 'status' => 'success',
@@ -418,7 +415,7 @@ class PerencanaanDataController extends Controller
     public function changeStatusPerencanaan($informasiUmumId)
     {
         try {
-            $changeStatus = $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.SELESAI_PERENCANAAN'), $informasiUmumId);
+            $changeStatus = $this->perencanaanDataService->changeStatusPerencanaanData(config('constants.STATUS_PENGUMPULAN'), $informasiUmumId);
 
             if ($changeStatus) {
                 return response()->json([
@@ -438,13 +435,7 @@ class PerencanaanDataController extends Controller
 
     public function tableListPerencanaan()
     {
-        $status = [
-            config('constants.SELESAI_PERENCANAAN'),
-            config('constants.IDENTIFIKASI_KEBUTUHAN'),
-            config('constants.SHORTLIST_VENDOR'),
-            config('constants.PERANCANGAN_KUESIONER'),
-        ];
-        $list = $this->perencanaanDataService->tableListPerencanaanData($status);
+        $list = $this->perencanaanDataService->tableListPerencanaanData(config('constants.STATUS_PERENCANAAN'));
         if (isset($list)) {
             return response()->json([
                 'status' => 'success',

@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TeamPengumpulanData extends Model
+class TeamTeknisBalai extends Model
 {
     use HasFactory;
-    protected $table = 'team_pengumpulan_data';
+    protected $table = 'team_teknis_balai';
     protected $fillable = [
         'nama_team',
-        'nama_ketua',
-        'nama_sekretaris',
-        'nama_anggota',
+        'user_id_ketua',
+        'user_id_sekretaris',
         'url_sk_penugasan'
+    ];
+
+    protected $casts = [
+        'user_id_anggota' => 'array',
     ];
 }
