@@ -18,13 +18,17 @@ class VerificationController extends Controller
         }
 
         if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified.']);
+            //return response()->json(['message' => 'Email already verified.']);
+            return redirect()->route('verification.already_verified');
         }
 
         if ($user->markEmailAsVerified()) {
+            $user->status = 'verification';
+            $user->save();
             event(new Verified($user));
         }
 
-        return response()->json(['message' => 'Email successfully verified.']);
+        //return response()->json(['message' => 'Email successfully verified.']);
+        return redirect()->route('verification.success');
     }
 }

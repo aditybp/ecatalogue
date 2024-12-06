@@ -80,6 +80,15 @@ Route::get('/test-email', function () {
     return 'Email sent!';
 });
 
+
+Route::get('/verification/success', function () {
+    return view('verification.success');
+})->name('verification.success');
+
+Route::get('/verification/already-verified', function () {
+    return view('verification.already_verified');
+})->name('verification.already_verified');
+
 Route::get('/password/reset/{token}', function ($token) {
     return view('auth.password.reset', ['token' => $token]);
 })->name('password.reset');
