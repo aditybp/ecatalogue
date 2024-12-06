@@ -119,4 +119,14 @@ class UsersController extends Controller
             'data' => $getRole
         ]);
     }
+
+    public function getListUserVerification()
+    {
+        $list = $this->userService->listUser();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'berhasil menampilkan data',
+            'data' => $list
+        ]);
+    }
 }

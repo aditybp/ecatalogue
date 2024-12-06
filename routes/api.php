@@ -33,7 +33,9 @@ use Illuminate\Support\Facades\Mail;
 // });
 
 Route::post('/send-username', [AccountController::class, 'sendUsernameAndEmail']);
+
 Route::get('/list-role', [UsersController::class, 'listRole']);
+Route::get('/user/list-user-verif', [UsersController::class, 'getListUserVerification']);
 
 Route::get('/get-balai-kerja', [BalaiKerjaController::class, 'getAllSatuanBalaiKerja']);
 Route::post('/store-balai-kerja', [BalaiKerjaController::class, 'storeSatuanBalaiKerja']);
