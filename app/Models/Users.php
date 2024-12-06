@@ -23,4 +23,9 @@ class Users extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(SatuanKerja::class, 'satuan_kerja_id');
     }
+
+    public function balaiSatuanKerja()
+    {
+        return $this->belongsTo(SatuanBalaiKerja::class, 'balai_kerja_id');
+    }
 }
