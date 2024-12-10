@@ -213,26 +213,9 @@ class PengumpulanDataService
             ->where('shortlist_vendor.id', $shortlistId)
             ->first();
 
-        $material = Material::select(
-            'material.id',
-            'material.nama_material',
-            'material.spesifikasi',
-            'material.satuan',
-            'material.merk'
-        )->where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
-        $peralatan = Peralatan::select(
-            'peralatan.id',
-            'peralatan.nama_peralatan',
-            'peralatan.spesifikasi',
-            'peralatan.satuan',
-            'peralatan.merk'
-        )->where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
-        $tenagaKerja = TenagaKerja::select(
-            'tenaga_kerja.id',
-            'tenaga_kerja.jenis_tenaga_kerja',
-            'tenaga_kerja.satuan',
-        )->where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
-
+        $material = Material::where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
+        $peralatan = Peralatan::where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
+        $tenagaKerja = TenagaKerja::where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
 
         $kategoriVendor = KategoriVendor::whereIn('id', json_decode($vendor['kategori_vendor_id'], true))
             ->select('nama_kategori_vendor as name')
