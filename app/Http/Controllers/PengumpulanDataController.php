@@ -431,7 +431,7 @@ class PengumpulanDataController extends Controller
     {
         $rules = [
             'id_user' => 'required',
-            'pengumpulan_data_id' => 'required',
+            'petugas_lapangan_id' => 'required',
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -443,7 +443,7 @@ class PengumpulanDataController extends Controller
         }
 
         try {
-            $assign = $this->pengumpulanDataService->assignPenugasan('petugas lapangan', $request->id_user, $request->pengumpulan_data_id);
+            $assign = $this->pengumpulanDataService->assignPenugasan('petugas lapangan', $request->id_user, $request->petugas_lapangan_id);
             if ($assign) {
                 return response()->json([
                     'status' => 'success',
@@ -458,5 +458,65 @@ class PengumpulanDataController extends Controller
                 'error' => $th->getMessage()
             ]);
         }
+    }
+
+    public function tableListPengumpulanData()
+    {
+        $list = $this->perencanaanDataService->tableListPerencanaanData(config('constants.STATUS_PENGUMPULAN'));
+        if (isset($list)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
+                'data' => $list
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
+            ]);
+        }
+    }
+
+    public function viewPdfKuisioner($id)
+    {
+        $kuisioner = $this->pengumpulanDataService->showKuisioner($id);
+        if (isset($kuisioner)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
+                'data' => $kuisioner
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
+            ]);
+        }
+    }
+
+    public function listVendorByPaket($id)
+    {
+        $list = $this->pengumpulanDataService->listVendorByPerencanaanId($id);
+        if (isset($list)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
+                'data' => $list
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
+            ]);
+        }
+    }
+
+    public function getEntriData($id)
+    {
+        $data = $this->pengumpulanDataService->getEntriData($id);
+        return $data;
     }
 }

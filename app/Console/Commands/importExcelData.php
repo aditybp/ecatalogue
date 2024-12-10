@@ -6,9 +6,6 @@ use App\Models\SatuanBalaiKerja;
 use App\Models\SatuanKerja;
 use App\Models\Unor;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Excel as ExcelType;
-use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class importExcelData extends Command
