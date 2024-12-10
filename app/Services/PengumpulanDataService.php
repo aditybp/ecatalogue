@@ -2,11 +2,16 @@
 
 namespace App\Services;
 
+use App\Models\KategoriVendor;
+use App\Models\Material;
 use App\Models\Pengawas;
 use App\Models\PengolahData;
+use App\Models\Peralatan;
 use App\Models\PerencanaanData;
 use App\Models\PetugasLapangan;
+use App\Models\ShortlistVendor;
 use App\Models\TeamTeknisBalai;
+use App\Models\TenagaKerja;
 use App\Models\Users;
 use Illuminate\Support\Facades\Storage;
 
@@ -160,5 +165,74 @@ class PengumpulanDataService
                 ]
             );
         }
+    }
+
+    public function listVendorByPerencanaanId($perencanaanId)
+    {
+        return ShortlistVendor::select(
+            'id As shortlist_id',
+            'shortlist_vendor_id As informasi_umum_id',
+            'nama_vendor',
+            'pemilik_vendor As pic',
+            'alamat As alamat_vendor'
+        )
+            ->where('shortlist_vendor_id', $perencanaanId)
+            ->get();
+    }
+
+    public function showKuisioner($shortlistId)
+    {
+        return ShortlistVendor::select(
+            'url_kuisioner'
+        )
+            ->where('id', $shortlistId)
+            ->first();
+    }
+
+    public function generateLinkKuisioner() {}
+
+    public function getPemeriksaanData($id) {}
+
+    public function getEntriData($shortlistId)
+    {
+        $vendor = ShortlistVendor::select(
+            'data_vendors.nama_vendor',
+            'data_vendors.kategori_vendor_id',
+            'data_vendors.alamat',
+            'data_vendors.no_telepon',
+            'data_vendors.provinsi_id',
+            'data_vendors.kota_id',
+            'provinces.nama_provinsi',
+            'cities.nama_kota',
+            'shortlist_vendor.shortlist_vendor_id As identifikasi_kebutuhan_id',
+            'data_vendors.id As vendor_id'
+        )
+            ->join('data_vendors', 'shortlist_vendor.data_vendor_id', '=', 'data_vendors.id')
+            ->join('provinces', 'data_vendors.provinsi_id', '=', 'provinces.kode_provinsi')
+            ->join('cities', 'data_vendors.kota_id', '=', 'cities.kode_kota')
+            ->where('shortlist_vendor.id', $shortlistId)
+            ->first();
+
+        $material = Material::where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
+        $peralatan = Peralatan::where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
+        $tenagaKerja = TenagaKerja::where('identifikasi_kebutuhan_id', $vendor['identifikasi_kebutuhan_id'])->get();
+
+        $kategoriVendor = KategoriVendor::whereIn('id', json_decode($vendor['kategori_vendor_id'], true))
+            ->select('nama_kategori_vendor as name')
+            ->get();
+        $stringKategoriVendor = $kategoriVendor->pluck('name')->implode(', ');
+
+        $response = [
+            'provinsi' => $vendor['nama_provinsi'],
+            'kota' => $vendor['nama_kota'],
+            'nama_responden' => $vendor['nama_vendor'],
+            'alamat' => $vendor['alamat'],
+            'no_telepon' => $vendor['no_telepon'],
+            'kategori_responden' => $stringKategoriVendor,
+            'material' => $material,
+            'peralatan' => $peralatan,
+            'tenaga_kerja' => $tenagaKerja,
+        ];
+        return $response;
     }
 }

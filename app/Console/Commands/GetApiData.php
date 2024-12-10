@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use App\Models\Provinces;
 use App\Models\Cities;
+use GuzzleHttp\Client;
 
 class GetApiData extends Command
 {
@@ -31,9 +32,9 @@ class GetApiData extends Command
     public function handle()
     {
         $apiUrl = 'https://sipedas.pertanian.go.id/api/wilayah/list_wilayah?thn=2024&lvl=10&lv2=11';
-        
+
         $response = Http::get($apiUrl);
-        
+
         if ($response->successful()) {
             $data = $response->json();
 

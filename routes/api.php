@@ -115,3 +115,7 @@ Route::get('/pengumpulan-data/list-petugas-lapangan', [PengumpulanDataController
 Route::post('/pengumpulan-data/assign-pengawas', [PengumpulanDataController::class, 'assignPengawas']);
 Route::post('/pengumpulan-data/assign-pengolah-data', [PengumpulanDataController::class, 'assignPengolahData']);
 Route::post('/pengumpulan-data/assign-petugas-lapangan', [PengumpulanDataController::class, 'assignPetugasLapangan']);
+
+Route::get('/pengumpulan-data/get-entri-data/{id}', [PengumpulanDataController::class, 'getEntriData']);
+Route::get('/pengumpulan-data/view-pdf-kuisioner/{id}', [PengumpulanDataController::class, 'viewPdfKuisioner']);
+Route::get('/pengumpulan-data/list-vendor-by-paket/{id}', [PengumpulanDataController::class, 'listVendorByPaket']);
