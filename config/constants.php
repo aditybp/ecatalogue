@@ -9,4 +9,5 @@ return [
     'STATUS_PERENCANAAN' => 'Proses Perencanaan Data',
 
     'STATUS_PENGUMPULAN' => 'Pengumpulan Data',
+    'STATUS_PEMERIKSAAN' => 'Pemeriksaan Data',
 ];

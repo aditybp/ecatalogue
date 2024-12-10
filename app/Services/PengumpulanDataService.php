@@ -223,6 +223,8 @@ class PengumpulanDataService
         $stringKategoriVendor = $kategoriVendor->pluck('name')->implode(', ');
 
         $response = [
+            'data_vendor_id' => $vendor['vendor_id'],
+            'identifikasi_kebutuhan_id' => $vendor['identifikasi_kebutuhan_id'],
             'provinsi' => $vendor['nama_provinsi'],
             'kota' => $vendor['nama_kota'],
             'nama_responden' => $vendor['nama_vendor'],
@@ -234,5 +236,82 @@ class PengumpulanDataService
             'tenaga_kerja' => $tenagaKerja,
         ];
         return $response;
+    }
+
+    public function changeStatusVerification($id)
+    {
+        return PerencanaanData::updateOrCreate(
+            [
+                'identifikasi_kebutuhan_id' => $id,
+            ],
+            [
+                'status' => config('constants.STATUS_PEMERIKSAAN'),
+            ]
+        );
+    }
+
+    public function updateIdentifikasi($table, $tableId, $data)
+    {
+        if ($table == 'material') {
+            return Material::updateOrCreate(
+                [
+                    'id' => $tableId,
+                ],
+                [
+                    'satuan_setempat' => $data['satuan_setempat'],
+                    'satuan_setempat_panjang' => $data['satuan_setempat_panjang'],
+                    'satuan_setempat_lebar' => $data['satuan_setempat_lebar'],
+                    'satuan_setempat_tinggi' => $data['satuan_setempat_tinggi'],
+                    'konversi_satuan_setempat' => $data['konversi_satuan_setempat'],
+                    'harga_satuan_setempat' => $data['harga_satuan_setempat'],
+                    'harga_konversi_satuan_setempat' => $data['harga_konversi_satuan_setempat'],
+                    'harga_khusus' => $data['harga_khusus'],
+                    'keterangan' => $data['keterangan'],
+                ]
+            );
+        } elseif ($table == 'peralatan') {
+            return Peralatan::updateOrCreate(
+                [
+                    'id' => $tableId,
+                ],
+                [
+                    'satuan_setempat' => $data['satuan_setempat'],
+                    'harga_sewa_satuan_setempat' => $data['harga_sewa_satuan_setempat'],
+                    'harga_sewa_konversi' => $data['harga_sewa_konversi'],
+                    'harga_pokok' => $data['harga_pokok'],
+                    'keterangan' => $data['keterangan'],
+                ]
+            );
+        } elseif ($table == 'tenaga_kerja') {
+            return TenagaKerja::updateOrCreate(
+                [
+                    'id' => $tableId,
+                ],
+                [
+                    'harga_per_satuan_setempat' => $data['harga_per_satuan_setempat'],
+                    'harga_konversi_perjam' => $data['harga_konversi_perjam'],
+                    'harga_sewa_konversi' => $data['harga_sewa_konversi'],
+                    'harga_pokok' => $data['harga_pokok'],
+                    'keterangan' => $data['keterangan'],
+                ]
+            );
+        }
+    }
+
+    public function updateShortlistVendor($shortlistId, $vendorId, $data)
+    {
+        return ShortlistVendor::updateOrCreate(
+            [
+                'shortlist_vendor_id' => $shortlistId,
+                'data_vendor_id' => $vendorId
+            ],
+            [
+                'petugas_lapangan_id' => $data['user_id_petugas_lapangan'],
+                'pengawas_id' => $data['user_id_pengawas'],
+                'nama_pemberi_informasi' => $data['nama_pemberi_informasi'],
+                'tanggal_survei' => $data['data_vendor_id'],
+                'tanggal_pengawasan' => $data['identifikasi_kebutuhan_id']
+            ]
+        );
     }
 }
