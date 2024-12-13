@@ -540,22 +540,32 @@ class PengumpulanDataController extends Controller
             'nama_pemberi_informasi' => 'required',
             'data_vendor_id' => 'required',
             'identifikasi_kebutuhan_id' => 'required',
+            'tanggal_survei' => 'required',
+            'tanggal_pengawasan' => 'required',
         ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'validasi gagal!',
+                'error' => $validator->errors()
+            ]);
+        }
 
         try {
             $materialResult = [];
             foreach ($request->material as $material) {
-                $materialResult[] = $this->pengumpulanDataService->updateIdentifikasi('material', $material->id, $material);
+                $materialResult[] = $this->pengumpulanDataService->updateIdentifikasi('material', $material['id'], $material);
             }
 
             $peralatanResult = [];
             foreach ($request->peralatan as $peralatan) {
-                $peralatanResult[] = $this->pengumpulanDataService->updateIdentifikasi('peralatan', $peralatan->id, $peralatan);
+                $peralatanResult[] = $this->pengumpulanDataService->updateIdentifikasi('peralatan', $peralatan['id'], $peralatan);
             }
 
             $tenagaKerjaResult = [];
             foreach ($request->tenaga_kerja as $tenaga_kerja) {
-                $tenagaKerjaResult[] = $this->pengumpulanDataService->updateIdentifikasi('tenaga_kerja', $tenaga_kerja->id, $tenaga_kerja);
+                $tenagaKerjaResult[] = $this->pengumpulanDataService->updateIdentifikasi('tenaga_kerja', $tenaga_kerja['id'], $tenaga_kerja);
             }
 
             $updateShortlist = $this->pengumpulanDataService->updateShortlistVendor($request->identifikasi_kebutuhan_id, $request->data_vendor_id, $request);

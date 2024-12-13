@@ -290,8 +290,6 @@ class PengumpulanDataService
                 [
                     'harga_per_satuan_setempat' => $data['harga_per_satuan_setempat'],
                     'harga_konversi_perjam' => $data['harga_konversi_perjam'],
-                    'harga_sewa_konversi' => $data['harga_sewa_konversi'],
-                    'harga_pokok' => $data['harga_pokok'],
                     'keterangan' => $data['keterangan'],
                 ]
             );
@@ -309,8 +307,8 @@ class PengumpulanDataService
                 'petugas_lapangan_id' => $data['user_id_petugas_lapangan'],
                 'pengawas_id' => $data['user_id_pengawas'],
                 'nama_pemberi_informasi' => $data['nama_pemberi_informasi'],
-                'tanggal_survei' => $data['data_vendor_id'],
-                'tanggal_pengawasan' => $data['identifikasi_kebutuhan_id']
+                'tanggal_survei' => $data['tanggal_survei'],
+                'tanggal_pengawasan' => $data['tanggal_pengawasan']
             ]
         );
     }

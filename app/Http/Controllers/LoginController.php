@@ -52,6 +52,9 @@ class LoginController extends Controller
             $account = auth('api')->user();
             $token = JWTAuth::fromUser($account);
 
+            $check = $this->loginService->getUserFromId($account['user_id']);
+            $token = JWTAuth::customClaims(['role' => $check['role_name']])->fromUser($account);
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'berhasil login!',
@@ -84,5 +87,33 @@ class LoginController extends Controller
             'token' => Auth::refresh(),
             'data' => Auth::user()
         ]);
+    }
+
+    public function checkRole(Request $request)
+    {
+        try {
+            $token = JWTAuth::parseToken();
+            $payload = $token->getPayload();
+            $role = $payload->get('role');
+            if ($role) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Role retrieved successfully.',
+                    'data' => $role,
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Role retrieved successfully.',
+                    'data' => [],
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token is invalid or expired.',
+                'error' => $e->getMessage()
+            ], 401);
+        }
     }
 }

@@ -21,6 +21,15 @@ class Material extends Model
         'merk',
         'provincies_id',
         'cities_id',
+        'identifikasi_kebutuhan_id',
+        'satuan_setempat',
+        'satuan_setempat_panjang',
+        'satuan_setempat_lebar',
+        'satuan_setempat_tinggi',
+        'harga_satuan_setempat',
+        'harga_konversi_satuan_setempat',
+        'harga_khusus',
+        'keterangan',
     ];
 
     public function perencanaanData()

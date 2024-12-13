@@ -21,6 +21,12 @@ class Peralatan extends Model
         'merk',
         'provincies_id',
         'cities_id',
+        'identifikasi_kebutuhan_id',
+        'satuan_setempat',
+        'harga_sewa_satuan_setempat',
+        'harga_sewa_konversi',
+        'harga_pokok',
+        'keterangan',
     ];
 
     public function perencanaanData()

@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Mail;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::post('/check-role', [LoginController::class, 'checkRole']);
 
 Route::post('/send-username', [AccountController::class, 'sendUsernameAndEmail']);
 
@@ -119,3 +120,6 @@ Route::post('/pengumpulan-data/assign-petugas-lapangan', [PengumpulanDataControl
 Route::get('/pengumpulan-data/get-entri-data/{id}', [PengumpulanDataController::class, 'getEntriData']);
 Route::get('/pengumpulan-data/view-pdf-kuisioner/{id}', [PengumpulanDataController::class, 'viewPdfKuisioner']);
 Route::get('/pengumpulan-data/list-vendor-by-paket/{id}', [PengumpulanDataController::class, 'listVendorByPaket']);
+
+Route::post('/pengumpulan-data/store-entri-data', [PengumpulanDataController::class, 'entriDataSave']);
+Route::post('/pengumpulan-data/verifikasi-pengawas', [PengumpulanDataController::class, 'verifikasiPengawas']);
