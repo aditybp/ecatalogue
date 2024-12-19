@@ -534,23 +534,23 @@ class PengumpulanDataController extends Controller
 
     public function entriDataSave(Request $request)
     {
-        $rules = [
-            'user_id_petugas_lapangan' => 'required',
-            'user_id_pengawas' => 'required',
-            'nama_pemberi_informasi' => 'required',
-            'data_vendor_id' => 'required',
-            'identifikasi_kebutuhan_id' => 'required',
-            'tanggal_survei' => 'required',
-            'tanggal_pengawasan' => 'required',
-        ];
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'validasi gagal!',
-                'error' => $validator->errors()
-            ]);
-        }
+        // $rules = [
+        //     'user_id_petugas_lapangan' => 'required',
+        //     'user_id_pengawas' => 'required',
+        //     'nama_pemberi_informasi' => 'required',
+        //     'data_vendor_id' => 'required',
+        //     'identifikasi_kebutuhan_id' => 'required',
+        //     'tanggal_survei' => 'required',
+        //     'tanggal_pengawasan' => 'required',
+        // ];
+        // $validator = Validator::make($request->all(), $rules);
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'validasi gagal!',
+        //         'error' => $validator->errors()
+        //     ]);
+        // }
 
         try {
             $materialResult = [];
@@ -593,7 +593,8 @@ class PengumpulanDataController extends Controller
     public function verifikasiPengawas(Request $request)
     {
         $rules = [
-            'identifikasi_kebutuhan_id' => 'required'
+            'identifikasi_kebutuhan_id' => 'required',
+            'berita_acara' => 'required|file|mimes:pdf,doc,docx|max:2048'
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -605,7 +606,11 @@ class PengumpulanDataController extends Controller
         }
 
         try {
-            $data = $this->pengumpulanDataService->changeStatusVerification($request['identifikasi_kebutuhan_id']);
+            if ($request->hasFile('berita_acara')) {
+                $filePath = $request->file('berita_acara')->store('berita_acara');
+            }
+
+            $data = $this->pengumpulanDataService->changeStatusVerification($request['identifikasi_kebutuhan_id'], $filePath);
             if (isset($data)) {
                 return response()->json([
                     'status' => 'success',

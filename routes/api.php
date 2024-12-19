@@ -14,6 +14,7 @@ use App\Http\Controllers\ProvinceAndCitiesController;
 use App\Http\Controllers\SatuanKerjaController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\KuisionerController;
+use App\Http\Controllers\SurveyKuisionerController;
 use App\Models\SatuanBalaiKerja;
 use Illuminate\Support\Facades\Mail;
 
@@ -123,3 +124,7 @@ Route::get('/pengumpulan-data/list-vendor-by-paket/{id}', [PengumpulanDataContro
 
 Route::post('/pengumpulan-data/store-entri-data', [PengumpulanDataController::class, 'entriDataSave']);
 Route::post('/pengumpulan-data/verifikasi-pengawas', [PengumpulanDataController::class, 'verifikasiPengawas']);
+
+Route::get('/pengumpulan-data/generate-link/{id}', [SurveyKuisionerController::class, 'generateLinkKuisioner']);
+Route::get('/survey-kuisioner/get-data-survey', [SurveyKuisionerController::class, 'getDataForSurveyKuisioner']);
+Route::post('/survey-kuisioner/store-survey-kuisioner', [SurveyKuisionerController::class, 'storeSurveyKuisioner']);
