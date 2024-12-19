@@ -517,6 +517,113 @@ class PengumpulanDataController extends Controller
     public function getEntriData($id)
     {
         $data = $this->pengumpulanDataService->getEntriData($id);
-        return $data;
+        if (isset($data)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
+            ]);
+        }
+    }
+
+    public function entriDataSave(Request $request)
+    {
+        // $rules = [
+        //     'user_id_petugas_lapangan' => 'required',
+        //     'user_id_pengawas' => 'required',
+        //     'nama_pemberi_informasi' => 'required',
+        //     'data_vendor_id' => 'required',
+        //     'identifikasi_kebutuhan_id' => 'required',
+        //     'tanggal_survei' => 'required',
+        //     'tanggal_pengawasan' => 'required',
+        // ];
+        // $validator = Validator::make($request->all(), $rules);
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'validasi gagal!',
+        //         'error' => $validator->errors()
+        //     ]);
+        // }
+
+        try {
+            $materialResult = [];
+            foreach ($request->material as $material) {
+                $materialResult[] = $this->pengumpulanDataService->updateIdentifikasi('material', $material['id'], $material);
+            }
+
+            $peralatanResult = [];
+            foreach ($request->peralatan as $peralatan) {
+                $peralatanResult[] = $this->pengumpulanDataService->updateIdentifikasi('peralatan', $peralatan['id'], $peralatan);
+            }
+
+            $tenagaKerjaResult = [];
+            foreach ($request->tenaga_kerja as $tenaga_kerja) {
+                $tenagaKerjaResult[] = $this->pengumpulanDataService->updateIdentifikasi('tenaga_kerja', $tenaga_kerja['id'], $tenaga_kerja);
+            }
+
+            $updateShortlist = $this->pengumpulanDataService->updateShortlistVendor($request->identifikasi_kebutuhan_id, $request->data_vendor_id, $request);
+            $response = [
+                'keterangan' => $updateShortlist,
+                'material' => $materialResult,
+                'peralatan' => $peralatanResult,
+                'tenaga_kerja' => $tenagaKerjaResult,
+            ];
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil disimpan!',
+                'data' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data!',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function verifikasiPengawas(Request $request)
+    {
+        $rules = [
+            'identifikasi_kebutuhan_id' => 'required',
+            'berita_acara' => 'required|file|mimes:pdf,doc,docx|max:2048'
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'validasi gagal!',
+                'data' => []
+            ]);
+        }
+
+        try {
+            if ($request->hasFile('berita_acara')) {
+                $filePath = $request->file('berita_acara')->store('berita_acara');
+            }
+
+            $data = $this->pengumpulanDataService->changeStatusVerification($request['identifikasi_kebutuhan_id'], $filePath);
+            if (isset($data)) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data berhasil disimpan',
+                    'data' => $data
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data',
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

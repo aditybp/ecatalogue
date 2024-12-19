@@ -14,6 +14,7 @@ use App\Http\Controllers\ProvinceAndCitiesController;
 use App\Http\Controllers\SatuanKerjaController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\KuisionerController;
+use App\Http\Controllers\SurveyKuisionerController;
 use App\Models\SatuanBalaiKerja;
 use Illuminate\Support\Facades\Mail;
 
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Mail;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::post('/check-role', [LoginController::class, 'checkRole']);
 
 Route::post('/send-username', [AccountController::class, 'sendUsernameAndEmail']);
 
@@ -119,3 +121,10 @@ Route::post('/pengumpulan-data/assign-petugas-lapangan', [PengumpulanDataControl
 Route::get('/pengumpulan-data/get-entri-data/{id}', [PengumpulanDataController::class, 'getEntriData']);
 Route::get('/pengumpulan-data/view-pdf-kuisioner/{id}', [PengumpulanDataController::class, 'viewPdfKuisioner']);
 Route::get('/pengumpulan-data/list-vendor-by-paket/{id}', [PengumpulanDataController::class, 'listVendorByPaket']);
+
+Route::post('/pengumpulan-data/store-entri-data', [PengumpulanDataController::class, 'entriDataSave']);
+Route::post('/pengumpulan-data/verifikasi-pengawas', [PengumpulanDataController::class, 'verifikasiPengawas']);
+
+Route::get('/pengumpulan-data/generate-link/{id}', [SurveyKuisionerController::class, 'generateLinkKuisioner']);
+Route::get('/survey-kuisioner/get-data-survey', [SurveyKuisionerController::class, 'getDataForSurveyKuisioner']);
+Route::post('/survey-kuisioner/store-survey-kuisioner', [SurveyKuisionerController::class, 'storeSurveyKuisioner']);

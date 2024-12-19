@@ -129,4 +129,6 @@ class UsersController extends Controller
             'data' => $list
         ]);
     }
+
+    public function getRoleByToken() {}
 }

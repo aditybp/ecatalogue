@@ -9,7 +9,21 @@ class ShortlistVendor extends Model
 {
     use HasFactory;
     protected $table = 'shortlist_vendor';
-    protected $fillable = ['data_vendor_id', 'shortlist_vendor_id', 'nama_vendor', 'pemilik_vendor', 'alamat', 'kontak', 'url_kuisioner', 'sumber_daya'];
+    protected $fillable = [
+        'data_vendor_id',
+        'shortlist_vendor_id',
+        'nama_vendor',
+        'pemilik_vendor',
+        'alamat',
+        'kontak',
+        'url_kuisioner',
+        'sumber_daya',
+        'petugas_lapangan_id',
+        'pengawas_id',
+        'nama_pemberi_informasi',
+        'tanggal_survei',
+        'tanggal_pengawasan',
+    ];
 
     public function perencanaanData()
     {

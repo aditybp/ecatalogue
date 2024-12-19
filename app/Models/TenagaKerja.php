@@ -17,6 +17,10 @@ class TenagaKerja extends Model
         'kodefikasi',
         'provincies_id',
         'cities_id',
+        'identifikasi_kebutuhan_id',
+        'harga_per_satuan_setempat',
+        'harga_konversi_perjam',
+        'keterangan',
     ];
 
     public function perencanaanData()

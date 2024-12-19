@@ -92,14 +92,15 @@ class PerencanaanDataService
     {
         return PerencanaanData::join('informasi_umum', 'perencanaan_data.informasi_umum_id', '=', 'informasi_umum.id')
             ->where('perencanaan_data.status', $status)
-            ->get([
-                'perencanaan_data.id',
+            ->select([
+                'perencanaan_data.informasi_umum_id As id',
                 'perencanaan_data.status',
                 'informasi_umum.nama_paket',
                 'informasi_umum.nama_balai',
                 'informasi_umum.nama_ppk',
                 'informasi_umum.jabatan_ppk',
                 'informasi_umum.kode_rup'
-            ]);
+            ])
+            ->get();
     }
 }
