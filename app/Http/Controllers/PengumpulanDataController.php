@@ -594,13 +594,14 @@ class PengumpulanDataController extends Controller
     {
         $rules = [
             'identifikasi_kebutuhan_id' => 'required',
+            'data_vendor_id' => 'required',
             'berita_acara' => 'required|file|mimes:pdf,doc,docx|max:2048'
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'validasi gagal!',
+                'message' => $validator->error(),
                 'data' => []
             ]);
         }
@@ -609,6 +610,9 @@ class PengumpulanDataController extends Controller
             if ($request->hasFile('berita_acara')) {
                 $filePath = $request->file('berita_acara')->store('berita_acara');
             }
+
+            $this->pengumpulanDataService->updateDataVerifikasiPengawas($request);
+            $this->pengumpulanDataService->pemeriksaanDataList($request);
 
             $data = $this->pengumpulanDataService->changeStatusVerification($request['identifikasi_kebutuhan_id'], $filePath);
             if (isset($data)) {
