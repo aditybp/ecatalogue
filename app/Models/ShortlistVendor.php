@@ -23,6 +23,13 @@ class ShortlistVendor extends Model
         'nama_pemberi_informasi',
         'tanggal_survei',
         'tanggal_pengawasan',
+        'catatan_blok_1',
+        'catatan_blok_2',
+        'catatan_blok_3',
+        'catatan_blok_4',
+        'id_pemeriksaan',
+        'status_pemeriksaan',
+        'verified_by',
     ];
 
     public function perencanaanData()

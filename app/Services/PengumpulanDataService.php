@@ -18,6 +18,7 @@ use App\Models\TenagaKerja;
 use App\Models\TenagaKerjaModel;
 use App\Models\TenagaKerjaSurvey;
 use App\Models\Users;
+use App\Models\VerifikasiValidasi;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -436,9 +437,9 @@ class PengumpulanDataService
         $keteranganPetugas = $this->getKeteranganPetugas($vendor['petugas_lapangan_id']);
         $keteranganPengawas = $this->getKeteranganPetugas($vendor['pengawas_id']);
 
-        $material = Material::whereIn('id', json_decode($vendor['material_id']))->get();
-        $peralatan = Peralatan::whereIn('id', json_decode($vendor['peralatan_id']))->get();
-        $tenagaKerja = TenagaKerja::whereIn('id', json_decode($vendor['tenaga_kerja_id']))->get();
+        $material = ($vendor['material_id']) ? Material::whereIn('id', json_decode($vendor['material_id']))->get() : null;
+        $peralatan = ($vendor['peralatan_id']) ? Peralatan::whereIn('id', json_decode($vendor['peralatan_id']))->get() : null;
+        $tenagaKerja = ($vendor['tenaga_kerja_id']) ? TenagaKerja::whereIn('id', json_decode($vendor['tenaga_kerja_id']))->get() : null;
 
         $kategoriVendor = KategoriVendor::whereIn('id', json_decode($vendor['kategori_vendor_id'], true))
             ->select('nama_kategori_vendor as name')
@@ -473,6 +474,42 @@ class PengumpulanDataService
             'tenaga_kerja' => $tenagaKerja,
         ];
         return $response;
+    }
+
+    public function updateDataVerifikasiPengawas($data)
+    {
+        return ShortlistVendor::updateOrCreate(
+            [
+                'data_vendor_id' => $data['data_vendor_id'],
+                'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
+            ],
+            [
+                'catatan_blok_1' => $data['catatan_blok_1'],
+                'catatan_blok_2' => $data['catatan_blok_2'],
+                'catatan_blok_3' => $data['catatan_blok_3'],
+                'catatan_blok_4' => $data['catatan_blok_4'],
+            ]
+        );
+    }
+
+    public function pemeriksaanDataList($data)
+    {
+        $result = [];
+        foreach (json_decode($data['verifikasi_validasi'], true) as $value) {
+            $result[] = VerifikasiValidasi::updateOrCreate(
+                [
+                    'data_vendor_id' => $data['data_vendor_id'],
+                    'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
+                    'item_number' => $value['id_pemeriksaan'],
+                ],
+                [
+                    'status_pemeriksaan' => $value['status_pemeriksaan'],
+                    'verified_by' => $value['verified_by'],
+                ]
+            );
+        }
+
+        return $result;
     }
 
     public function changeStatusVerification($id, $filePath)
