@@ -330,80 +330,100 @@ class PengumpulanDataService
 
     private function getIdentifikasiSurvey($table, $id)
     {
-        $checkMaterial = MaterialSurvey::whereIn('material_id', json_decode($id))->exists();
-        $checkPeralatan = PeralatanSurvey::whereIn('peralatan_id', json_decode($id))->exists();
-        $checkTenagaKerja = TenagaKerjaSurvey::whereIn('tenaga_kerja_id', json_decode($id))->exists();
-        if ($table == 'material' && $checkMaterial) {
-            return Material::select(
-                'material.id',
-                'material.identifikasi_kebutuhan_id',
-                'material.nama_material',
-                'material.satuan',
-                'material.spesifikasi',
-                'material.ukuran',
-                'material.kodefikasi',
-                'material.kelompok_material',
-                'material.jumlah_kebutuhan',
-                'material.merk',
-                'material.provincies_id',
-                'material.cities_id',
-                'material_survey.satuan_setempat',
-                'material_survey.satuan_setempat_panjang',
-                'material_survey.satuan_setempat_lebar',
-                'material_survey.satuan_setempat_tinggi',
-                'material_survey.konversi_satuan_setempat',
-                'material_survey.harga_satuan_setempat',
-                'material_survey.harga_konversi_satuan_setempat',
-                'material_survey.harga_khusus',
-                'material_survey.keterangan',
-            )
-                ->join('material_survey', 'material.id', '=', 'material_survey.material_id')
-                ->whereIn('material.id', json_decode($id))->get();
-        } elseif ($table == 'material' && !$checkMaterial) {
-            return Material::whereIn('id', json_decode($id))->get();
-        } elseif ($table == 'peralatan' && $checkPeralatan) {
-            return Peralatan::select(
-                'peralatan.id',
-                'peralatan.identifikasi_kebutuhan_id',
-                'peralatan.nama_peralatan',
-                'peralatan.satuan',
-                'peralatan.spesifikasi',
-                'peralatan.kapasitas',
-                'peralatan.kodefikasi',
-                'peralatan.kelompok_peralatan',
-                'peralatan.jumlah_kebutuhan',
-                'peralatan.merk',
-                'peralatan.provincies_id',
-                'peralatan.cities_id',
-                'peralatan_survey.satuan_setempat',
-                'peralatan_survey.harga_sewa_satuan_setempat',
-                'peralatan_survey.harga_sewa_konversi',
-                'peralatan_survey.harga_pokok',
-            )
-                ->join('peralatan_survey', 'peralatan.id', 'peralatan_survey.peralatan_id')
-                ->whereIn('peralatan.id', json_decode($id))->get();
-        } elseif ($table == 'peralatan' && !$checkPeralatan) {
-            return Peralatan::whereIn('id', json_decode($id))->get();
-        } elseif ($table == 'tenaga_kerja' && $checkTenagaKerja) {
-            return TenagaKerja::select(
-                'tenaga_kerja.id',
-                'tenaga_kerja.identifikasi_kebutuhan_id',
-                'tenaga_kerja.jenis_tenaga_kerja',
-                'tenaga_kerja.satuan',
-                'tenaga_kerja.jumlah_kebutuhan',
-                'tenaga_kerja.kodefikasi',
-                'tenaga_kerja.provincies_id',
-                'tenaga_kerja.cities_id',
-                'tenaga_kerja_survey.harga_per_satuan_setempat',
-                'tenaga_kerja_survey.harga_konversi_perjam',
-                'tenaga_kerja_survey.keterangan',
-            )
-                ->join('tenaga_kerja_survey', 'tenaga_kerja.id', 'tenaga_kerja_survey.tenaga_kerja_id')
-                ->whereIn('tenaga_kerja.id', json_decode($id))->get();
-        } elseif ($table == 'tenaga_kerja' && !$checkTenagaKerja) {
-            return TenagaKerja::whereIn('id', json_decode($id))->get();
+        // Decode JSON and ensure it's an array
+        $idArray = json_decode($id, true);
+        if (!is_array($idArray) || empty($idArray)) {
+            return collect(); // Return an empty collection if $id is invalid or empty
         }
+
+        // Check for existence in related surveys
+        $checkMaterial = MaterialSurvey::whereIn('material_id', $idArray)->exists();
+        $checkPeralatan = PeralatanSurvey::whereIn('peralatan_id', $idArray)->exists();
+        $checkTenagaKerja = TenagaKerjaSurvey::whereIn('tenaga_kerja_id', $idArray)->exists();
+
+        if ($table == 'material') {
+            if ($checkMaterial) {
+                return Material::select(
+                    'material.id',
+                    'material.identifikasi_kebutuhan_id',
+                    'material.nama_material',
+                    'material.satuan',
+                    'material.spesifikasi',
+                    'material.ukuran',
+                    'material.kodefikasi',
+                    'material.kelompok_material',
+                    'material.jumlah_kebutuhan',
+                    'material.merk',
+                    'material.provincies_id',
+                    'material.cities_id',
+                    'material_survey.satuan_setempat',
+                    'material_survey.satuan_setempat_panjang',
+                    'material_survey.satuan_setempat_lebar',
+                    'material_survey.satuan_setempat_tinggi',
+                    'material_survey.konversi_satuan_setempat',
+                    'material_survey.harga_satuan_setempat',
+                    'material_survey.harga_konversi_satuan_setempat',
+                    'material_survey.harga_khusus',
+                    'material_survey.keterangan',
+                )
+                    ->join('material_survey', 'material.id', '=', 'material_survey.material_id')
+                    ->whereIn('material.id', $idArray)
+                    ->get();
+            } else {
+                return Material::whereIn('id', $idArray)->get();
+            }
+        } elseif ($table == 'peralatan') {
+            if ($checkPeralatan) {
+                return Peralatan::select(
+                    'peralatan.id',
+                    'peralatan.identifikasi_kebutuhan_id',
+                    'peralatan.nama_peralatan',
+                    'peralatan.satuan',
+                    'peralatan.spesifikasi',
+                    'peralatan.kapasitas',
+                    'peralatan.kodefikasi',
+                    'peralatan.kelompok_peralatan',
+                    'peralatan.jumlah_kebutuhan',
+                    'peralatan.merk',
+                    'peralatan.provincies_id',
+                    'peralatan.cities_id',
+                    'peralatan_survey.satuan_setempat',
+                    'peralatan_survey.harga_sewa_satuan_setempat',
+                    'peralatan_survey.harga_sewa_konversi',
+                    'peralatan_survey.harga_pokok',
+                )
+                    ->join('peralatan_survey', 'peralatan.id', '=', 'peralatan_survey.peralatan_id')
+                    ->whereIn('peralatan.id', $idArray)
+                    ->get();
+            } else {
+                return Peralatan::whereIn('id', $idArray)->get();
+            }
+        } elseif ($table == 'tenaga_kerja') {
+            if ($checkTenagaKerja) {
+                return TenagaKerja::select(
+                    'tenaga_kerja.id',
+                    'tenaga_kerja.identifikasi_kebutuhan_id',
+                    'tenaga_kerja.jenis_tenaga_kerja',
+                    'tenaga_kerja.satuan',
+                    'tenaga_kerja.jumlah_kebutuhan',
+                    'tenaga_kerja.kodefikasi',
+                    'tenaga_kerja.provincies_id',
+                    'tenaga_kerja.cities_id',
+                    'tenaga_kerja_survey.harga_per_satuan_setempat',
+                    'tenaga_kerja_survey.harga_konversi_perjam',
+                    'tenaga_kerja_survey.keterangan',
+                )
+                    ->join('tenaga_kerja_survey', 'tenaga_kerja.id', '=', 'tenaga_kerja_survey.tenaga_kerja_id')
+                    ->whereIn('tenaga_kerja.id', $idArray)
+                    ->get();
+            } else {
+                return TenagaKerja::whereIn('id', $idArray)->get();
+            }
+        }
+
+        return collect(); // Default return for unsupported $table
     }
+
 
     public function getEntriData($shortlistId)
     {
@@ -495,7 +515,7 @@ class PengumpulanDataService
     public function pemeriksaanDataList($data)
     {
         $result = [];
-        foreach (json_decode($data['verifikasi_validasi'], true) as $value) {
+        foreach ($data['verifikasi_validasi'] as $value) {
             $result[] = VerifikasiValidasi::updateOrCreate(
                 [
                     'data_vendor_id' => $data['data_vendor_id'],
@@ -520,6 +540,19 @@ class PengumpulanDataService
             ],
             [
                 'status' => config('constants.STATUS_PEMERIKSAAN'),
+                'doc_berita_acara' => $filePath,
+            ]
+        );
+    }
+
+    public function changeStatusValidation($id, $filePath, $status)
+    {
+        return PerencanaanData::updateOrCreate(
+            [
+                'identifikasi_kebutuhan_id' => $id,
+            ],
+            [
+                'status' => $status,
                 'doc_berita_acara' => $filePath,
             ]
         );
@@ -659,21 +692,34 @@ class PengumpulanDataService
 
             return PerencanaanData::updateOrCreate(
                 [
-                    'shortlist_vendor_id' => $shortlistVendorId,
+                    'shortlist_vendor_id' => $shortlistVendorId['shortlist_vendor_id'],
+                ],
+                [
+                    'status' => $status
+                ]
+            );
+        } else {
+            return PerencanaanData::updateOrCreate(
+                [
+                    'shortlist_vendor_id' => $id,
                 ],
                 [
                     'status' => $status
                 ]
             );
         }
+    }
 
-        return PerencanaanData::updateOrCreate(
-            [
-                'shortlist_vendor_id' => $id,
-            ],
-            [
-                'status' => $status
-            ]
-        );
+    public function getPemeriksaanDataList($dataVendorId, $shortlistVendorId)
+    {
+        $data = VerifikasiValidasi::select(
+            'data_vendor_id',
+            'shortlist_vendor_id',
+            'item_number',
+            'status_pemeriksaan',
+            'verified_by',
+        )->where('data_vendor_id', $dataVendorId)
+            ->where('shortlist_vendor_id', $shortlistVendorId)->get();
+        return $data;
     }
 }

@@ -18,7 +18,8 @@ class PerencanaanData extends Model
         'petugas_lapangan_id',
         'pengawas_id',
         'pengolah_data_id',
-        'doc_berita_acara'
+        'doc_berita_acara',
+        'doc_berita_acara_validasi'
     ];
 
     public function informasiUmum()
