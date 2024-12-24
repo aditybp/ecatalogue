@@ -14,6 +14,7 @@ use App\Http\Controllers\ProvinceAndCitiesController;
 use App\Http\Controllers\SatuanKerjaController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\KuisionerController;
+use App\Http\Controllers\PemeriksaanAndRekonsiliasiController;
 use App\Http\Controllers\SurveyKuisionerController;
 use App\Models\SatuanBalaiKerja;
 use Illuminate\Support\Facades\Mail;
@@ -128,3 +129,7 @@ Route::post('/pengumpulan-data/verifikasi-pengawas', [PengumpulanDataController:
 Route::get('/pengumpulan-data/generate-link/{id}', [SurveyKuisionerController::class, 'generateLinkKuisioner']);
 Route::get('/survey-kuisioner/get-data-survey', [SurveyKuisionerController::class, 'getDataForSurveyKuisioner']);
 Route::post('/survey-kuisioner/store-survey-kuisioner', [SurveyKuisionerController::class, 'storeSurveyKuisioner']);
+
+Route::get('/pemeriksaan-rekonsiliasi/get-list-data', [PemeriksaanAndRekonsiliasiController::class, 'getAllDataPemeriksaanRekonsiliasi']);
+Route::get('/pemeriksaan-rekonsiliasi/get-data-pemeriksaan-rekonsiliasi/{id}', [PemeriksaanAndRekonsiliasiController::class, 'getDataPemeriksaanRekonsiliasi']);
+Route::post('/pemeriksaan-rekonsiliasi/store-verifikasi-validasi', [PemeriksaanAndRekonsiliasiController::class, 'storePemeriksaanRekonsiliasi']);

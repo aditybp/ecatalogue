@@ -13,4 +13,7 @@ return [
     'STATUS_VERIFIKASI_PENGAWAS' => 'Verifikasi dan Valuasi Oleh Pengawas',
     'STATUS_ENTRI_DATA' => 'Proses Entri Data',
     'STATUS_PEMERIKSAAN' => 'Pemeriksaan Data',
+
+    'STATUS_REKONSILIASI' => 'Dalam Proses Rekonsiliasi',
+    'STATUS_PENYEBARLUASAN_DATA' => 'Penyebarluasan Data',
 ];

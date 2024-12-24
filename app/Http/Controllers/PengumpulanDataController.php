@@ -601,7 +601,7 @@ class PengumpulanDataController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $validator->error(),
+                'message' => $validator->errors(),
                 'data' => []
             ]);
         }
