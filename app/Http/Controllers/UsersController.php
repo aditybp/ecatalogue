@@ -64,7 +64,7 @@ class UsersController extends Controller
             $user->satuan_kerja_id = $request->satuan_kerja_id;
             $user->balai_kerja_id = $request->balai_kerja_id;
             $user->status = 'register';
-            $user->id_roles = 1; //menyusul tergantung ntarnya
+            $user->id_roles = 2; //menyusul tergantung ntarnya
             $user->save();
 
             event(new Registered($user)); //send email verification

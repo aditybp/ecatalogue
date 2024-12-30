@@ -515,16 +515,16 @@ class PengumpulanDataService
     public function pemeriksaanDataList($data)
     {
         $result = [];
-        foreach ($data['verifikasi_validasi'] as $value) {
+        foreach (json_decode($data['verifikasi_validasi']) as $value) {
             $result[] = VerifikasiValidasi::updateOrCreate(
                 [
-                    'data_vendor_id' => $data['data_vendor_id'],
-                    'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
-                    'item_number' => $value['id_pemeriksaan'],
+                    'data_vendor_id' => $data->data_vendor_id,
+                    'shortlist_vendor_id' => $data->identifikasi_kebutuhan_id,
+                    'item_number' => $value->id_pemeriksaan,
                 ],
                 [
-                    'status_pemeriksaan' => $value['status_pemeriksaan'],
-                    'verified_by' => $value['verified_by'],
+                    'status_pemeriksaan' => $value->status_pemeriksaan,
+                    'verified_by' => $value->verified_by,
                 ]
             );
         }
