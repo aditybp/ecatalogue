@@ -23,6 +23,7 @@ class RolesSeeder extends Seeder
             ['nama' => 'Direktorat'],
             ['nama' => 'Pengolah Data'],
             ['nama' => 'Koordinator Provinsi'],
+            ['nama' => 'eksternal app']
         ]);
     }
 }

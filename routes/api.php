@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BalaiKerjaController;
+use App\Http\Controllers\EksternalAppController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
@@ -133,3 +134,7 @@ Route::post('/survey-kuisioner/store-survey-kuisioner', [SurveyKuisionerControll
 Route::get('/pemeriksaan-rekonsiliasi/get-list-data', [PemeriksaanAndRekonsiliasiController::class, 'getAllDataPemeriksaanRekonsiliasi']);
 Route::get('/pemeriksaan-rekonsiliasi/get-data-pemeriksaan-rekonsiliasi/{id}', [PemeriksaanAndRekonsiliasiController::class, 'getDataPemeriksaanRekonsiliasi']);
 Route::post('/pemeriksaan-rekonsiliasi/store-verifikasi-validasi', [PemeriksaanAndRekonsiliasiController::class, 'storePemeriksaanRekonsiliasi']);
+
+Route::get('/eksternal/get-all-data-material', [EksternalAppController::class, 'getAllDataMaterial']);
+Route::get('/eksternal/get-all-data-peralatan', [EksternalAppController::class, 'getAllDataPeralatan']);
+Route::get('/eksternal/get-all-data-tenaga-kerja', [EksternalAppController::class, 'getAllTenagaKerja']);
