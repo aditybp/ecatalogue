@@ -435,7 +435,12 @@ class PerencanaanDataController extends Controller
 
     public function tableListPerencanaan()
     {
-        $list = $this->perencanaanDataService->tableListPerencanaanData(config('constants.STATUS_PERENCANAAN'));
+        $status = [
+            config('constants.STATUS_PERENCANAAN'),
+            config('constants.STATUS_PENYEBARLUASAN_DATA'),
+
+        ];
+        $list = $this->perencanaanDataService->tableListPerencanaanData($status);
         if (isset($list)) {
             return response()->json([
                 'status' => 'success',

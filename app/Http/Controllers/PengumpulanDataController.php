@@ -129,7 +129,14 @@ class PengumpulanDataController extends Controller
 
     public function listPengumpulanData()
     {
-        $data = $this->perencanaanDataService->tableListPerencanaanData(config('constants.STATUS_PENGUMPULAN'));
+        $status = [
+            config('constants.STATUS_PENGUMPULAN'),
+            config('constants.STATUS_PENGISIAN_PETUGAS'),
+            config('constants.STATUS_VERIFIKASI_PENGAWAS'),
+            config('constants.STATUS_ENTRI_DATA'),
+            config('constants.STATUS_PEMERIKSAAN'),
+        ];
+        $data = $this->perencanaanDataService->tableListPerencanaanData($status);
         if ($data) {
             return response()->json([
                 'status' => 'success',
