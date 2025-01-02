@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Mail;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-Route::post('/check-role', [LoginController::class, 'checkRole']);
+Route::get('/check-role', [LoginController::class, 'checkRole']);
 
 Route::post('/send-username', [AccountController::class, 'sendUsernameAndEmail']);
 

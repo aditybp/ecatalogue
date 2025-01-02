@@ -89,7 +89,7 @@ class LoginController extends Controller
         ]);
     }
 
-    public function checkRole(Request $request)
+    public function checkRole()
     {
         try {
             $token = JWTAuth::parseToken();
