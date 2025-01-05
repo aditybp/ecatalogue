@@ -199,9 +199,10 @@ class PengumpulanDataController extends Controller
         }
     }
 
-    public function listUser()
+    public function listUser(Request $request)
     {
-        $getData = $this->pengumpulanDataService->listUserPengumpulan();
+        $roles = $this->pengumpulanDataService->getListRoles($request['role']);
+        $getData = $this->pengumpulanDataService->listUserPengumpulan($roles);
         if ($getData) {
             return response()->json([
                 'status' => 'success',

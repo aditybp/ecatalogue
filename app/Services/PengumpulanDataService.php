@@ -12,6 +12,7 @@ use App\Models\Peralatan;
 use App\Models\PeralatanSurvey;
 use App\Models\PerencanaanData;
 use App\Models\PetugasLapangan;
+use App\Models\Roles;
 use App\Models\ShortlistVendor;
 use App\Models\TeamTeknisBalai;
 use App\Models\TenagaKerja;
@@ -56,12 +57,20 @@ class PengumpulanDataService
         );
     }
 
-    public function listUserPengumpulan()
+    public function listUserPengumpulan($role)
     {
         return Users::select('id AS user_id', 'nama_lengkap')
             ->where('status', 'active')
+            ->where('id_roles', $role)
             ->whereNotNull('email_verified_at')
             ->whereNot('id_roles', 1)->get();
+    }
+
+    public function getListRoles($rolesString)
+    {
+        $role = Roles::select('id')
+            ->where('nama', $rolesString)->first();
+        return $role['id'];
     }
 
     public function listPenugasan($table)
