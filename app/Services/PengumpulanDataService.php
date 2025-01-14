@@ -59,7 +59,7 @@ class PengumpulanDataService
 
     public function listUserPengumpulan($role)
     {
-        return Users::select('id AS user_id', 'nama_lengkap')
+        return Users::select('id AS user_id', 'nama_lengkap', 'nrp AS nip')
             ->where('status', 'active')
             ->where('id_roles', $role)
             ->whereNotNull('email_verified_at')

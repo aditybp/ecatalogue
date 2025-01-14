@@ -18,7 +18,12 @@ class SurveyKuisionerController extends Controller
 
     public function generateLinkKuisioner($id)
     {
-        $urlToken = $this->pengumpulanDataService->generateLinkKuisioner($id);
+        if (condition) {
+            $urlToken = $this->pengumpulanDataService->generateLinkKuisioner($id);
+        } else {
+            $urlToken = $this->pengumpulanDataService->generateLinkKuisioner($id);
+        }
+
         if ($urlToken) {
             $this->pengumpulanDataService->changeStatus($id, config('constants.STATUS_PENGISIAN_PETUGAS'));
             return response()->json([

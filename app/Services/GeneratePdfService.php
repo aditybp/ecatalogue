@@ -71,6 +71,20 @@ class GeneratePdfService
         return $query;
     }
 
+    private function peralatanLanjutan()
+    {
+        $pdf = new Fpdf();
+        $pdf->AddPage('L');
+        $pdf->SetFont('Arial', 'B', 6);
+        $pdf->Image(resource_path('views/pdf/template_peralatan_lanjutan.jpg'), 0, 0, 297, 210);
+
+        $tempFIlePath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $pdf->Output('F', $tempFIlePath);
+        $pdfFiles[] = $tempFIlePath;
+
+        return $pdfFiles;
+    }
+
     private function pdfMaterial($dataVendor, $id)
     {
         $pdfTempPath = [];
@@ -318,10 +332,11 @@ class GeneratePdfService
         }
 
         $pdfInformasiUmum = $this->pdfPeralatanInformasiUmum($templatePath, $dataVendor);
+        $pdfLanjutan = $this->peralatanLanjutan();
         $pdfIdentifikasi = $this->peralatanPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
         $catatanKuisoner = $this->catatankuisonerPdf();
 
-        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi, $catatanKuisoner);
+        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfLanjutan, $pdfIdentifikasi, $catatanKuisoner);
 
         return $pdfTempPath;
     }

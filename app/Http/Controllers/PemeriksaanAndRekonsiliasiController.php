@@ -22,6 +22,7 @@ class PemeriksaanAndRekonsiliasiController extends Controller
     public function getAllDataPemeriksaanRekonsiliasi()
     {
         $status = [
+            config('constants.STATUS_PEMERIKSAAN'),
             config('constants.STATUS_REKONSILIASI'),
             config('constants.STATUS_PENYEBARLUASAN_DATA'),
         ];
@@ -76,7 +77,11 @@ class PemeriksaanAndRekonsiliasiController extends Controller
             foreach ($storeData as $value) {
                 if (strtolower($value['status_pemeriksaan']) == "tidak memenuhi") {
                     $this->pengumpulanDataService->changeStatusValidation($request['identifikasi_kebutuhan_id'], $filePath, config('constants.STATUS_REKONSILIASI'));
-                    break;
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Data berhasil disimpan',
+                        'data' => $storeData
+                    ]);
                 }
             }
 
