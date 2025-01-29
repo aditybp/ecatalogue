@@ -59,7 +59,7 @@ class GeneratePdfService
     private function getIdentifikasi($id, $category)
     {
         if ($category == 'material') {
-            $query = Material::select('id', 'nama_material', 'satuan', 'spesifikasi', 'merk')->find($id)->all();
+            $query = Material::select('id', 'nama_material', 'satuan', 'spesifikasi', 'merk', 'kelompok_material')->find($id)->all();
         } elseif ($category == 'peralatan') {
             $query = Peralatan::select('id', 'nama_peralatan', 'satuan', 'spesifikasi', 'merk')->find($id)->all();
         } elseif ($category == 'tenaga_kerja') {
@@ -88,21 +88,45 @@ class GeneratePdfService
     private function pdfMaterial($dataVendor, $id)
     {
         $pdfTempPath = [];
+        $pdfNatural = [];
+        $pdfPabrikan = [];
 
         $identifikasiKebutuhan = $this->getIdentifikasi($id, 'material');
 
         $templatePath = resource_path('views/pdf/template_material_natural.jpg');
+        $templatePathPabrikan = resource_path('views/pdf/template_material_pabrikan.jpg');
         $templateIdentifikasiPath = resource_path('views/pdf/template_material_natural_identifikasi.jpg');
+        $templateIdentifikasiPathPabrikan = resource_path('views/pdf/template_material_pabrikan_identifikasi.jpg');
 
         if (!file_exists($templatePath) || !file_exists($templateIdentifikasiPath)) {
             throw new \Exception('Template not found');
         }
 
-        $pdfInformasiUmum = $this->materialPdfInformasiUmum($templatePath, $dataVendor);
-        $pdfIdentifikasi = $this->materialPdfIdentifikasi($templateIdentifikasiPath, $identifikasiKebutuhan);
-        $catatanKuisoner = $this->catatankuisonerPdf();
+        $arrayBahanNatural = [];
+        $arrayBahanPabrikan = [];
+        foreach ($identifikasiKebutuhan as $value) {
+            if (strtolower($value['kelompok_material']) == "bahan baku") {
+                $arrayBahanNatural[] = $value;
+            } else {
+                $arrayBahanPabrikan[] = $value;
+            }
+        }
 
-        $pdfTempPath = array_merge($pdfInformasiUmum, $pdfIdentifikasi, $catatanKuisoner);
+        if (isset($arrayBahanNatural)) {
+            $pdfInformasiUmum = $this->materialPdfInformasiUmum($templatePath, $dataVendor);
+            $pdfIdentifikasi = $this->materialPdfIdentifikasi($templateIdentifikasiPath, $arrayBahanNatural);
+            $catatanKuisoner = $this->catatankuisonerPdf();
+            $pdfNatural = array_merge($pdfInformasiUmum, $pdfIdentifikasi, $catatanKuisoner);
+        }
+
+        if (isset($arrayBahanPabrikan)) {
+            $pdfInformasiUmumPabrikan = $this->materialPdfInformasiUmum($templatePathPabrikan, $dataVendor);
+            $pdfIdentifikasiPabrikan = $this->materialPdfIdentifikasi($templateIdentifikasiPathPabrikan, $arrayBahanPabrikan);
+            $catatanKuisoner = $this->catatankuisonerPdf();
+            $pdfPabrikan = array_merge($pdfInformasiUmumPabrikan, $pdfIdentifikasiPabrikan, $catatanKuisoner);
+        }
+
+        $pdfTempPath = array_merge($pdfNatural, $pdfPabrikan);
 
         return $pdfTempPath;
     }

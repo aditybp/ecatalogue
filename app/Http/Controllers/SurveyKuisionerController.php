@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\PengumpulanDataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\URL;
 
 class SurveyKuisionerController extends Controller
 {
@@ -18,18 +19,38 @@ class SurveyKuisionerController extends Controller
 
     public function generateLinkKuisioner($id)
     {
-        if (condition) {
+        $checkLink = $this->pengumpulanDataService->checkLinkSurveyFromShortlistId($id);
+        if ($checkLink == null) {
             $urlToken = $this->pengumpulanDataService->generateLinkKuisioner($id);
+            $this->pengumpulanDataService->saveTokenSurvey($id, $urlToken); //save token
         } else {
-            $urlToken = $this->pengumpulanDataService->generateLinkKuisioner($id);
+            $urlToken = $checkLink;
         }
 
+        $decode = json_decode(Crypt::decryptString($urlToken), true);
+        $timestamp = $decode['timestamp'];
+
+        if (now()->timestamp - $timestamp > 10 * 24 * 60 * 60) {
+            $urlToken = $this->pengumpulanDataService->generateLinkKuisioner($id);
+            $this->pengumpulanDataService->saveTokenSurvey($id, $urlToken);
+        }
+
+        $decode = json_decode(Crypt::decryptString($urlToken), true);
+        $timestamp = $decode['timestamp'];
+        $targetTimestamp = $timestamp + (10 * 24 * 60 * 60);
+
         if ($urlToken) {
+            $url = URL::to('/api/survey-kuisioner/get-data-survey') . '?token=' . urlencode($urlToken);
             $this->pengumpulanDataService->changeStatus($id, config('constants.STATUS_PENGISIAN_PETUGAS'));
+
             return response()->json([
                 'status' => 'success',
                 'message' => config('constants.SUCCESS_MESSAGE_GET'),
-                'data' => $urlToken
+                'data' => [
+                    'token' => $url,
+                    'date_expired' => date('d-m-Y', $targetTimestamp)
+                ]
+
             ]);
         } else {
             return response()->json([

@@ -135,6 +135,7 @@ class PengumpulanDataController extends Controller
             config('constants.STATUS_VERIFIKASI_PENGAWAS'),
             config('constants.STATUS_ENTRI_DATA'),
             config('constants.STATUS_PEMERIKSAAN'),
+            config('constants.STATUS_NOT_QUALIFIED_AB'),
         ];
         $data = $this->perencanaanDataService->tableListPerencanaanData($status);
         if ($data) {
@@ -540,6 +541,24 @@ class PengumpulanDataController extends Controller
         }
     }
 
+    public function getEntriDataForSurvey($id)
+    {
+        $data = $this->pengumpulanDataService->getDataForKuisioner($id);
+        if (isset($data)) {
+            return response()->json([
+                'status' => 'success',
+                'message' => config('constants.SUCCESS_MESSAGE_GET'),
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => config('constants.ERROR_MESSAGE_GET'),
+                'data' => []
+            ]);
+        }
+    }
+
     public function entriDataSave(Request $request)
     {
         // $rules = [
@@ -603,7 +622,6 @@ class PengumpulanDataController extends Controller
         $rules = [
             'identifikasi_kebutuhan_id' => 'required',
             'data_vendor_id' => 'required',
-            //'berita_acara' => 'required|file|mimes:pdf,doc,docx|max:2048'
         ];
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -618,11 +636,24 @@ class PengumpulanDataController extends Controller
             if ($request->hasFile('berita_acara')) {
                 $filePath = $request->file('berita_acara')->store('berita_acara');
             } else {
-                $filePath = '-';
+                $filePath = "-";
             }
+
+            $this->pengumpulanDataService->storeBeritaAcaraPemeriksaan($filePath, $request['data_vendor_id'], $request['identifikasi_kebutuhan_id']); //save berita acara
 
             $this->pengumpulanDataService->updateDataVerifikasiPengawas($request);
             $this->pengumpulanDataService->pemeriksaanDataList($request);
+
+            foreach ($request['verifikasi_validasi'] as $value) {
+                if (strtolower($value['status_pemeriksaan']) == 'tidak memenuhi') {
+                    $dataChange = $this->pengumpulanDataService->changeStatusValidation($request['identifikasi_kebutuhan_id'], $filePath, config('constants.STATUS_NOT_QUALIFIED_AB'));
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Data berhasil disimpan',
+                        'data' => $dataChange
+                    ]);
+                }
+            }
 
             $data = $this->pengumpulanDataService->changeStatusVerification($request['identifikasi_kebutuhan_id'], $filePath);
             if (isset($data)) {
@@ -636,6 +667,53 @@ class PengumpulanDataController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal menyimpan data',
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function entriDataSaveHardCopy(Request $request)
+    {
+        try {
+
+            if ($request->hasFile('file_kuisioner')) {
+                $filePath = $request->file('file_kuisioner')->store('file_kuisioner');
+            } else {
+                $filePath = '-';
+            }
+
+            $materialResult = [];
+            foreach ($request->material as $material) {
+                $materialResult[] = $this->pengumpulanDataService->updateIdentifikasi('material', $material['id'], $material);
+            }
+
+            $peralatanResult = [];
+            foreach ($request->peralatan as $peralatan) {
+                $peralatanResult[] = $this->pengumpulanDataService->updateIdentifikasi('peralatan', $peralatan['id'], $peralatan);
+            }
+
+            $tenagaKerjaResult = [];
+            foreach ($request->tenaga_kerja as $tenaga_kerja) {
+                $tenagaKerjaResult[] = $this->pengumpulanDataService->updateIdentifikasi('tenaga_kerja', $tenaga_kerja['id'], $tenaga_kerja);
+            }
+
+            $updateShortlist = $this->pengumpulanDataService->updateShortlistVendorHardcopyKuisioner($request->identifikasi_kebutuhan_id, $request->data_vendor_id, $request, $filePath);
+            $response = [
+                'keterangan' => $updateShortlist,
+                'material' => $materialResult,
+                'peralatan' => $peralatanResult,
+                'tenaga_kerja' => $tenagaKerjaResult,
+            ];
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data berhasil disimpan!',
+                'data' => $response
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data!',
                 'error' => $e->getMessage()
             ]);
         }

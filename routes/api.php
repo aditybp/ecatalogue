@@ -79,7 +79,7 @@ Route::post('/store-satuan-kerja', [SatuanKerjaController::class, 'storeSatuanKe
 
 Route::get('/test-email', function () {
     Mail::raw('This is a test email', function ($message) {
-        $message->to('bayuaditya0111@gmail.com')
+        $message->to('-')
             ->subject('Test Email');
     });
 
@@ -121,10 +121,12 @@ Route::post('/pengumpulan-data/assign-pengolah-data', [PengumpulanDataController
 Route::post('/pengumpulan-data/assign-petugas-lapangan', [PengumpulanDataController::class, 'assignPetugasLapangan']);
 
 Route::get('/pengumpulan-data/get-entri-data/{id}', [PengumpulanDataController::class, 'getEntriData']);
+Route::get('/pengumpulan-data/get-entri-data-survey-kuisioner/{id}', [PengumpulanDataController::class, 'getEntriDataForSurvey']);
 Route::get('/pengumpulan-data/view-pdf-kuisioner/{id}', [PengumpulanDataController::class, 'viewPdfKuisioner']);
 Route::get('/pengumpulan-data/list-vendor-by-paket/{id}', [PengumpulanDataController::class, 'listVendorByPaket']);
 
 Route::post('/pengumpulan-data/store-entri-data', [PengumpulanDataController::class, 'entriDataSave']);
+Route::post('/pengumpulan-data/store-entri-data-hardcopy', [PengumpulanDataController::class, 'entriDataSaveHardCopy']);
 Route::post('/pengumpulan-data/verifikasi-pengawas', [PengumpulanDataController::class, 'verifikasiPengawas']);
 
 Route::get('/pengumpulan-data/generate-link/{id}', [SurveyKuisionerController::class, 'generateLinkKuisioner']);

@@ -17,5 +17,6 @@ class KeteranganPetugasSurvey extends Model
         'tanggal_pengawasan',
         'nama_pemberi_informasi',
         'identifikasi_kebutuhan_id',
+        'catatan',
     ];
 }
