@@ -138,6 +138,12 @@ class PengumpulanDataController extends Controller
             config('constants.STATUS_NOT_QUALIFIED_AB'),
         ];
         $data = $this->perencanaanDataService->tableListPerencanaanData($status);
+
+        foreach ($data as &$value) {
+            $status = $this->pengumpulanDataService->checkStatusPacketList($value['id']);
+            $value['status_verifikasi_document'] = $status;
+        }
+
         if ($data) {
             return response()->json([
                 'status' => 'success',
@@ -508,6 +514,12 @@ class PengumpulanDataController extends Controller
     public function listVendorByPaket($id)
     {
         $list = $this->pengumpulanDataService->listVendorByPerencanaanId($id);
+        foreach ($list as &$value) {
+            $checkVerif = $this->pengumpulanDataService->checkStatusVerif($value['data_vendor_id'], $value['informasi_umum_id']);
+            $value['status_verifikasi_document'] = $checkVerif;
+            unset($value['data_vendor_id']);
+        }
+
         if (isset($list)) {
             return response()->json([
                 'status' => 'success',
@@ -642,7 +654,7 @@ class PengumpulanDataController extends Controller
             $this->pengumpulanDataService->storeBeritaAcaraPemeriksaan($filePath, $request['data_vendor_id'], $request['identifikasi_kebutuhan_id']); //save berita acara
 
             $this->pengumpulanDataService->updateDataVerifikasiPengawas($request);
-            $this->pengumpulanDataService->pemeriksaanDataList($request);
+            $this->pengumpulanDataService->pemeriksaanDataListPemeriksaan($request);
 
             foreach ($request['verifikasi_validasi'] as $value) {
                 if (strtolower($value['status_pemeriksaan']) == 'tidak memenuhi') {
@@ -653,6 +665,15 @@ class PengumpulanDataController extends Controller
                         'data' => $dataChange
                     ]);
                 }
+            }
+
+            $checkStatusBefore = $this->pengumpulanDataService->checkStatusBefore($request['identifikasi_kebutuhan_id']);
+            if ($checkStatusBefore[0]['status'] ==  config('constants.STATUS_NOT_QUALIFIED_AB')) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data berhasil disimpan',
+                    'data' => $checkStatusBefore
+                ]);
             }
 
             $data = $this->pengumpulanDataService->changeStatusVerification($request['identifikasi_kebutuhan_id'], $filePath);

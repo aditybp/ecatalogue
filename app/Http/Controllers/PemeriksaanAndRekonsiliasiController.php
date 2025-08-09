@@ -95,7 +95,7 @@ class PemeriksaanAndRekonsiliasiController extends Controller
                 $tenagaKerjaResult[] = $this->pengumpulanDataService->updateIdentifikasiPemeriksaanUpdate('tenaga_kerja', $tenaga_kerja['id'], $tenaga_kerja);
             }
 
-            $this->pengumpulanDataService->updateShortlistVendorVerifikasiValidasi($request['identifikasi_kebutuhan_id'], $request['data_vendor_id'], $blok_2_and_3);
+            $this->pengumpulanDataService->updateShortlistVendorVerifikasiValidasi($request['identifikasi_kebutuhan_id'], $request['data_vendor_id'], $blok_2_and_3, $request['catatan_blok_v']);
 
             foreach ($storeDataValidasi as $value) {
                 if (strtolower($value['status_pemeriksaan']) == "tidak memenuhi") {

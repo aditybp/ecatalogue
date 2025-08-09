@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
+use function PHPUnit\Framework\isEmpty;
+
 class PengumpulanDataService
 {
     public function storeTeamPengumpulanData($data)
@@ -193,6 +195,7 @@ class PengumpulanDataService
             'nama_vendor',
             'pemilik_vendor As pic',
             'alamat As alamat_vendor',
+            'data_vendor_id As data_vendor_id',
             DB::raw("CASE 
                     WHEN file_kuisioner = '-' 
                     THEN 'online' 
@@ -534,6 +537,7 @@ class PengumpulanDataService
                 'catatan_blok_2' => $data['catatan_blok_2'],
                 'catatan_blok_3' => $data['catatan_blok_3'],
                 'catatan_blok_4' => $data['catatan_blok_4'],
+                'catatan' => $data['catatan_blok_v'],
             ]
         );
     }
@@ -543,6 +547,26 @@ class PengumpulanDataService
         $result = [];
         $array = json_decode($data['verifikasi_validasi'], true);
         foreach ($array as $value) {
+            $result[] = VerifikasiValidasi::updateOrCreate(
+                [
+                    'data_vendor_id' => $data['data_vendor_id'],
+                    'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
+                    'item_number' => $value['id_pemeriksaan'],
+                ],
+                [
+                    'status_pemeriksaan' => $value['status_pemeriksaan'],
+                    'verified_by' => $value['verified_by'],
+                ]
+            );
+        }
+
+        return $result;
+    }
+
+    public function pemeriksaanDataListPemeriksaan($data)
+    {
+        $result = [];
+        foreach ($data['verifikasi_validasi'] as $value) {
             $result[] = VerifikasiValidasi::updateOrCreate(
                 [
                     'data_vendor_id' => $data['data_vendor_id'],
@@ -695,7 +719,7 @@ class PengumpulanDataService
         );
     }
 
-    public function updateShortlistVendorVerifikasiValidasi($shortlistId, $vendorId, $data)
+    public function updateShortlistVendorVerifikasiValidasi($shortlistId, $vendorId, $data, $catatanBlokV)
     {
         return ShortlistVendor::updateOrCreate(
             [
@@ -708,6 +732,7 @@ class PengumpulanDataService
                 'nama_pemberi_informasi' => $data[0]['nama_pemberi_informasi'],
                 'tanggal_survei' => Carbon::createFromFormat('d-m-Y', $data[0]['tanggal_survei'])->format('Y-m-d'),
                 'tanggal_pengawasan' => Carbon::createFromFormat('d-m-Y', $data[0]['tanggal_pengawasan'])->format('Y-m-d'),
+                'catatan' => $catatanBlokV,
             ]
         );
     }
@@ -888,5 +913,56 @@ class PengumpulanDataService
                 'file_kuisioner' => $filePath
             ]
         );
+    }
+
+    public function checkStatusBefore($identifikasiKebutuhanId)
+    {
+        return PerencanaanData::where('identifikasi_kebutuhan_id', $identifikasiKebutuhanId)->get();
+    }
+
+    public function checkStatusVerif($dataVendorId, $shortlistVendorId)
+    {
+        $data =  VerifikasiValidasi::select("status_pemeriksaan")
+            ->where('data_vendor_id', $dataVendorId)
+            ->where('shortlist_vendor_id', $shortlistVendorId)
+            ->where('item_number', 'LIKE', 'A%')->get();
+
+
+        if ($data->isEmpty()) {
+            return config('constants.STATUS_VENDOR_KOSONG');
+        }
+
+        foreach ($data as $value) {
+            if ($value['status_pemeriksaan'] == "tidak memenuhi") {
+                return config('constants.STATUS_VENDOR_TIDAK_MEMENUHI');
+            }
+        }
+
+        return config('constants.STATUS_VENDOR_MEMENUHI');
+    }
+
+    public function checkStatusPacketList($shortlistVendorId)
+    {
+        $data =  VerifikasiValidasi::select("status_pemeriksaan")
+            ->where('shortlist_vendor_id', $shortlistVendorId)
+            ->where('item_number', 'LIKE', 'A%')->get();
+
+
+        if ($data->isEmpty()) {
+            return config('constants.STATUS_VENDOR_KOSONG');
+        }
+
+        $countTidakMemenuhi = 0;
+        foreach ($data as $value) {
+            if ($value['status_pemeriksaan'] == "tidak memenuhi") {
+                $countTidakMemenuhi++;
+            }
+        }
+
+        if ($countTidakMemenuhi > 0) {
+            return config('constants.STATUS_VENDOR_TIDAK_MEMENUHI') . " : " . $countTidakMemenuhi;
+        }
+
+        return config('constants.STATUS_VENDOR_MEMENUHI');
     }
 }

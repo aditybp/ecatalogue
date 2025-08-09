@@ -20,4 +20,9 @@ return [
 
     'STATUS_REKONSILIASI' => 'Dalam Proses Rekonsiliasi',
     'STATUS_PENYEBARLUASAN_DATA' => 'Penyebarluasan Data',
+
+    'STATUS_VENDOR_TIDAK_MEMENUHI' => 'Verifikasi Dokumen Tidak Memenuhi',
+    'STATUS_VENDOR_MEMENUHI' => 'Verifikasi Dokumen Memenuhi',
+    'STATUS_VENDOR_KOSONG' => 'Belum Melakukan Verifikasi Dokumen',
+
 ];
