@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\KategoriVendor;
 use App\Models\KeteranganPetugasSurvey;
+use App\Models\LinkSurvey;
 use App\Models\Material;
 use App\Models\MaterialSurvey;
 use App\Models\Pengawas;
@@ -16,14 +17,15 @@ use App\Models\Roles;
 use App\Models\ShortlistVendor;
 use App\Models\TeamTeknisBalai;
 use App\Models\TenagaKerja;
-use App\Models\TenagaKerjaModel;
 use App\Models\TenagaKerjaSurvey;
 use App\Models\Users;
 use App\Models\VerifikasiValidasi;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\DB;
+
+use function PHPUnit\Framework\isEmpty;
 
 class PengumpulanDataService
 {
@@ -59,7 +61,7 @@ class PengumpulanDataService
 
     public function listUserPengumpulan($role)
     {
-        return Users::select('id AS user_id', 'nama_lengkap')
+        return Users::select('id AS user_id', 'nama_lengkap', 'nrp AS nip')
             ->where('status', 'active')
             ->where('id_roles', $role)
             ->whereNotNull('email_verified_at')
@@ -192,7 +194,13 @@ class PengumpulanDataService
             'shortlist_vendor_id As informasi_umum_id',
             'nama_vendor',
             'pemilik_vendor As pic',
-            'alamat As alamat_vendor'
+            'alamat As alamat_vendor',
+            'data_vendor_id As data_vendor_id',
+            DB::raw("CASE 
+                    WHEN file_kuisioner = '-' 
+                    THEN 'online' 
+                    ELSE 'offline' 
+                 END AS status")
         )
             ->where('shortlist_vendor_id', $perencanaanId)
             ->get();
@@ -216,9 +224,7 @@ class PengumpulanDataService
 
         $encryptedToken = Crypt::encryptString(json_encode($data));
 
-        $url = URL::to('/api/survey-kuisioner/get-data-survey') . '?token=' . urlencode($encryptedToken);
-
-        return $url;
+        return $encryptedToken;
     }
 
     private function getPengawasPetugasLapangan($shortlistId)
@@ -277,6 +283,7 @@ class PengumpulanDataService
             'shortlist_vendor.nama_pemberi_informasi',
             'shortlist_vendor.tanggal_survei',
             'shortlist_vendor.tanggal_pengawasan',
+            'shortlist_vendor.catatan',
             'data_vendors.id As vendor_id',
             'kuisioner_pdf_data.material_id',
             'kuisioner_pdf_data.peralatan_id',
@@ -300,6 +307,8 @@ class PengumpulanDataService
             ->select('nama_kategori_vendor as name')
             ->get();
         $stringKategoriVendor = $kategoriVendor->pluck('name')->implode(', ');
+
+        $verifikasiDokumen = $this->getPemeriksaanDataList($vendor['vendor_id'], $vendor['identifikasi_kebutuhan_id']);
 
         $response = [
             'data_vendor_id' => $vendor['vendor_id'],
@@ -327,25 +336,25 @@ class PengumpulanDataService
             'material' => $material,
             'peralatan' => $peralatan,
             'tenaga_kerja' => $tenagaKerja,
+            'catatan_blok_v' => isset($vendor['catatan']) ? $vendor['catatan'] : null,
+            'verifikasi_dokumen' => isset($verifikasiDokumen) ? $verifikasiDokumen : null,
         ];
         return $response;
     }
 
     private function getKeteranganPetugas($id)
     {
-        return Users::select('nama_lengkap As nama', 'nrp As nip')
+        return Users::select('id', 'nama_lengkap As nama', 'nrp As nip')
             ->where('id', $id)->first();
     }
 
     private function getIdentifikasiSurvey($table, $id)
     {
-        // Decode JSON and ensure it's an array
         $idArray = json_decode($id, true);
         if (!is_array($idArray) || empty($idArray)) {
-            return collect(); // Return an empty collection if $id is invalid or empty
+            return collect();
         }
 
-        // Check for existence in related surveys
         $checkMaterial = MaterialSurvey::whereIn('material_id', $idArray)->exists();
         $checkPeralatan = PeralatanSurvey::whereIn('peralatan_id', $idArray)->exists();
         $checkTenagaKerja = TenagaKerjaSurvey::whereIn('tenaga_kerja_id', $idArray)->exists();
@@ -430,7 +439,7 @@ class PengumpulanDataService
             }
         }
 
-        return collect(); // Default return for unsupported $table
+        return collect();
     }
 
 
@@ -451,6 +460,8 @@ class PengumpulanDataService
             'shortlist_vendor.nama_pemberi_informasi',
             'shortlist_vendor.tanggal_survei',
             'shortlist_vendor.tanggal_pengawasan',
+            'shortlist_vendor.file_kuisioner',
+            'shortlist_vendor.catatan',
             'data_vendors.id As vendor_id',
             'kuisioner_pdf_data.material_id',
             'kuisioner_pdf_data.peralatan_id',
@@ -475,7 +486,12 @@ class PengumpulanDataService
             ->get();
         $stringKategoriVendor = $kategoriVendor->pluck('name')->implode(', ');
 
+        $verifikasiDokumen = $this->getPemeriksaanDataList($vendor['vendor_id'], $shortlistId);
+
         $response = [
+            'file_pdf' => $vendor->file_kuisioner = $vendor->file_kuisioner
+                ? Storage::url($vendor->file_kuisioner)
+                : null,
             'data_vendor_id' => $vendor['vendor_id'],
             'identifikasi_kebutuhan_id' => $vendor['identifikasi_kebutuhan_id'],
             'provinsi' => $vendor['nama_provinsi'],
@@ -485,9 +501,11 @@ class PengumpulanDataService
             'no_telepon' => $vendor['no_telepon'],
             'kategori_responden' => $stringKategoriVendor,
             'keterangan_petugas_lapangan' => [
+                'id_petugas_lapangan' => isset($keteranganPetugas['id']) ? $keteranganPetugas['id'] : null,
                 'nama_petugas_lapangan' => isset($keteranganPetugas['nama']) ? $keteranganPetugas['nama'] : null,
                 'nip_petugas_lapangan' => isset($keteranganPetugas['nip']) ? $keteranganPetugas['nip'] : null,
                 'tanggal_survei' => isset($vendor['tanggal_survei']) ? Carbon::createFromFormat('Y-m-d', $vendor['tanggal_survei'])->format('d-m-Y') : null,
+                'id_pengawas' => isset($keteranganPengawas['id']) ? $keteranganPengawas['id'] : null,
                 'nama_pengawas' => isset($keteranganPengawas['nama']) ? $keteranganPengawas['nama'] : null,
                 'nip_pengawas' => isset($keteranganPengawas['nip']) ? $keteranganPengawas['nip'] : null,
                 'tanggal_pengawasan' => isset($vendor['tanggal_pengawasan']) ? Carbon::createFromFormat('Y-m-d', $vendor['tanggal_pengawasan'])->format('d-m-Y') : null,
@@ -501,6 +519,8 @@ class PengumpulanDataService
             'material' => $material,
             'peralatan' => $peralatan,
             'tenaga_kerja' => $tenagaKerja,
+            'catatan_blok_v' => isset($vendor['catatan']) ? $vendor['catatan'] : null,
+            'verifikasi_dokumen' => isset($verifikasiDokumen) ? $verifikasiDokumen : null,
         ];
         return $response;
     }
@@ -517,6 +537,7 @@ class PengumpulanDataService
                 'catatan_blok_2' => $data['catatan_blok_2'],
                 'catatan_blok_3' => $data['catatan_blok_3'],
                 'catatan_blok_4' => $data['catatan_blok_4'],
+                'catatan' => $data['catatan_blok_v'],
             ]
         );
     }
@@ -524,16 +545,37 @@ class PengumpulanDataService
     public function pemeriksaanDataList($data)
     {
         $result = [];
-        foreach (json_decode($data['verifikasi_validasi']) as $value) {
+        $array = json_decode($data['verifikasi_validasi'], true);
+        foreach ($array as $value) {
             $result[] = VerifikasiValidasi::updateOrCreate(
                 [
-                    'data_vendor_id' => $data->data_vendor_id,
-                    'shortlist_vendor_id' => $data->identifikasi_kebutuhan_id,
-                    'item_number' => $value->id_pemeriksaan,
+                    'data_vendor_id' => $data['data_vendor_id'],
+                    'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
+                    'item_number' => $value['id_pemeriksaan'],
                 ],
                 [
-                    'status_pemeriksaan' => $value->status_pemeriksaan,
-                    'verified_by' => $value->verified_by,
+                    'status_pemeriksaan' => $value['status_pemeriksaan'],
+                    'verified_by' => $value['verified_by'],
+                ]
+            );
+        }
+
+        return $result;
+    }
+
+    public function pemeriksaanDataListPemeriksaan($data)
+    {
+        $result = [];
+        foreach ($data['verifikasi_validasi'] as $value) {
+            $result[] = VerifikasiValidasi::updateOrCreate(
+                [
+                    'data_vendor_id' => $data['data_vendor_id'],
+                    'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
+                    'item_number' => $value['id_pemeriksaan'],
+                ],
+                [
+                    'status_pemeriksaan' => $value['status_pemeriksaan'],
+                    'verified_by' => $value['verified_by'],
                 ]
             );
         }
@@ -613,6 +655,88 @@ class PengumpulanDataService
         }
     }
 
+    public function updateIdentifikasiPemeriksaanUpdate($table, $tableId, $data)
+    {
+        if ($table == 'material') {
+            return Material::updateOrCreate(
+                [
+                    'id' => $tableId,
+                ],
+                [
+                    'satuan_setempat' => $data['satuan_setempat'],
+                    'satuan_setempat_panjang' => $data['satuan_setempat_panjang'],
+                    'satuan_setempat_lebar' => $data['satuan_setempat_lebar'],
+                    'satuan_setempat_tinggi' => $data['satuan_setempat_tinggi'],
+                    'konversi_satuan_setempat' => $data['konversi_satuan_setempat'],
+                    'harga_satuan_setempat' => $data['harga_satuan_setempat'],
+                    'harga_konversi_satuan_setempat' => $data['harga_konversi_satuan_setempat'],
+                    'harga_khusus' => $data['harga_khusus'],
+                    'keterangan' => $data['keterangan'],
+                ]
+            );
+        } elseif ($table == 'peralatan') {
+            return Peralatan::updateOrCreate(
+                [
+                    'id' => $tableId,
+                ],
+                [
+                    'satuan_setempat' => $data['satuan_setempat'],
+                    'harga_sewa_satuan_setempat' => $data['harga_sewa_satuan_setempat'],
+                    'harga_sewa_konversi' => $data['harga_sewa_konversi'],
+                    'harga_pokok' => $data['harga_pokok'],
+                    'keterangan' => $data['keterangan'],
+                ]
+            );
+        } elseif ($table == 'tenaga_kerja') {
+            return TenagaKerja::updateOrCreate(
+                [
+                    'id' => $tableId,
+                ],
+                [
+                    'harga_per_satuan_setempat' => $data['harga_per_satuan_setempat'],
+                    'harga_konversi_perjam' => $data['harga_konversi_perjam'],
+                    'keterangan' => $data['keterangan'],
+                ]
+            );
+        }
+    }
+
+    public function updateShortlistVendorPemeriksaanUpdate($shortlistId, $vendorId, $data)
+    {
+        return ShortlistVendor::updateOrCreate(
+            [
+                'shortlist_vendor_id' => $shortlistId,
+                'data_vendor_id' => $vendorId
+            ],
+            [
+                'petugas_lapangan_id' => $data->user_id_petugas_lapangan,
+                'pengawas_id' => $data->user_id_pengawas,
+                'nama_pemberi_informasi' => $data->nama_pemberi_informasi,
+                'tanggal_survei' => Carbon::createFromFormat('d-m-Y', $data->tanggal_survei)->format('Y-m-d'),
+                'tanggal_pengawasan' => Carbon::createFromFormat('d-m-Y', $data->tanggal_pengawasan)->format('Y-m-d'),
+                'catatan' => $data->catatan_blok_v,
+            ]
+        );
+    }
+
+    public function updateShortlistVendorVerifikasiValidasi($shortlistId, $vendorId, $data, $catatanBlokV)
+    {
+        return ShortlistVendor::updateOrCreate(
+            [
+                'shortlist_vendor_id' => $shortlistId,
+                'data_vendor_id' => $vendorId
+            ],
+            [
+                'petugas_lapangan_id' => $data[0]['user_id_petugas_lapangan'],
+                'pengawas_id' => $data[0]['user_id_pengawas'],
+                'nama_pemberi_informasi' => $data[0]['nama_pemberi_informasi'],
+                'tanggal_survei' => Carbon::createFromFormat('d-m-Y', $data[0]['tanggal_survei'])->format('Y-m-d'),
+                'tanggal_pengawasan' => Carbon::createFromFormat('d-m-Y', $data[0]['tanggal_pengawasan'])->format('Y-m-d'),
+                'catatan' => $catatanBlokV,
+            ]
+        );
+    }
+
     public function updateShortlistVendor($shortlistId, $vendorId, $data)
     {
 
@@ -627,6 +751,26 @@ class PengumpulanDataService
                 'nama_pemberi_informasi' => $data['nama_pemberi_informasi'],
                 'tanggal_survei' => Carbon::createFromFormat('d-m-Y', $data['tanggal_survei'])->format('Y-m-d'),
                 'tanggal_pengawasan' => Carbon::createFromFormat('d-m-Y', $data['tanggal_pengawasan'])->format('Y-m-d'),
+                'catatan' => $data['catatan_blok_v'],
+            ]
+        );
+    }
+
+    public function updateShortlistVendorHardcopyKuisioner($shortlistId, $vendorId, $data, $filePath)
+    {
+
+        return ShortlistVendor::updateOrCreate(
+            [
+                'shortlist_vendor_id' => $shortlistId,
+                'data_vendor_id' => $vendorId
+            ],
+            [
+                'petugas_lapangan_id' => $data['user_id_petugas_lapangan'],
+                'pengawas_id' => $data['user_id_pengawas'],
+                'nama_pemberi_informasi' => $data['nama_pemberi_informasi'],
+                'tanggal_survei' => Carbon::createFromFormat('d-m-Y', $data['tanggal_survei'])->format('Y-m-d'),
+                'tanggal_pengawasan' => Carbon::createFromFormat('d-m-Y', $data['tanggal_pengawasan'])->format('Y-m-d'),
+                'catatan' => $data['catatan_blok_v'],
             ]
         );
     }
@@ -679,9 +823,10 @@ class PengumpulanDataService
 
     public function storeKeteranganPetugasSurvey($data)
     {
-        return KeteranganPetugasSurvey::updateOrCreate(
+        return ShortlistVendor::updateOrCreate(
             [
-                'identifikasi_kebutuhan_id' => $data['identifikasi_kebutuhan_id'],
+                'data_vendor_id' => $data['data_vendor_id'],
+                'shortlist_vendor_id' => $data['identifikasi_kebutuhan_id'],
             ],
             [
                 'petugas_lapangan_id' => $data['user_id_petugas_lapangan'],
@@ -689,6 +834,7 @@ class PengumpulanDataService
                 'nama_pemberi_informasi' => $data['nama_pemberi_informasi'],
                 'tanggal_survei' => Carbon::createFromFormat('d-m-Y', $data['tanggal_survei'])->format('Y-m-d'),
                 'tanggal_pengawasan' => Carbon::createFromFormat('d-m-Y', $data['tanggal_pengawasan'])->format('Y-m-d'),
+                'catatan' => $data['catatan_blok_v'],
             ]
         );
     }
@@ -730,5 +876,93 @@ class PengumpulanDataService
         )->where('data_vendor_id', $dataVendorId)
             ->where('shortlist_vendor_id', $shortlistVendorId)->get();
         return $data;
+    }
+
+    public function checkLinkSurveyFromShortlistId($id)
+    {
+        $check = LinkSurvey::where('shortlist_vendor_id', $id)
+            ->latest()
+            ->value('link_survey');
+        if ($check) {
+            return $check;
+        } else {
+            return null;
+        }
+    }
+
+    public function saveTokenSurvey($shortlistId, $dataTokenSurvey)
+    {
+        return LinkSurvey::updateOrCreate(
+            [
+                'shortlist_vendor_id' => $shortlistId,
+            ],
+            [
+                'link_survey' => $dataTokenSurvey
+            ]
+        );
+    }
+
+    public function storeBeritaAcaraPemeriksaan($filePath, $dataVendorId, $shortlistVendorId)
+    {
+        return ShortlistVendor::updateOrCreate(
+            [
+                'data_vendor_id' => $dataVendorId,
+                'shortlist_vendor_id' => $shortlistVendorId,
+            ],
+            [
+                'file_kuisioner' => $filePath
+            ]
+        );
+    }
+
+    public function checkStatusBefore($identifikasiKebutuhanId)
+    {
+        return PerencanaanData::where('identifikasi_kebutuhan_id', $identifikasiKebutuhanId)->get();
+    }
+
+    public function checkStatusVerif($dataVendorId, $shortlistVendorId)
+    {
+        $data =  VerifikasiValidasi::select("status_pemeriksaan")
+            ->where('data_vendor_id', $dataVendorId)
+            ->where('shortlist_vendor_id', $shortlistVendorId)
+            ->where('item_number', 'LIKE', 'A%')->get();
+
+
+        if ($data->isEmpty()) {
+            return config('constants.STATUS_VENDOR_KOSONG');
+        }
+
+        foreach ($data as $value) {
+            if ($value['status_pemeriksaan'] == "tidak memenuhi") {
+                return config('constants.STATUS_VENDOR_TIDAK_MEMENUHI');
+            }
+        }
+
+        return config('constants.STATUS_VENDOR_MEMENUHI');
+    }
+
+    public function checkStatusPacketList($shortlistVendorId)
+    {
+        $data =  VerifikasiValidasi::select("status_pemeriksaan")
+            ->where('shortlist_vendor_id', $shortlistVendorId)
+            ->where('item_number', 'LIKE', 'A%')->get();
+
+
+        if ($data->isEmpty()) {
+            return config('constants.STATUS_VENDOR_KOSONG');
+        }
+
+        $countTidakMemenuhi = 0;
+        foreach ($data as $value) {
+            if ($value['status_pemeriksaan'] == "tidak memenuhi") {
+                $countTidakMemenuhi++;
+            }
+        }
+
+        if ($countTidakMemenuhi > 0) {
+            return config('constants.STATUS_VENDOR_TIDAK_MEMENUHI') . " : " . $countTidakMemenuhi;
+        }
+
+        return config('constants.STATUS_VENDOR_MEMENUHI');
     }
 }

@@ -34,8 +34,11 @@ class LoginService
     {
         return Users::select(
             'users.nama_lengkap',
-            'roles.nama As role_name',
-        )->join('roles', 'users.id_roles', '=', 'roles.id')
-            ->where('users.id', $id)->first();
+            'roles.nama as role_name'
+        )
+            ->join('roles', 'users.id_roles', '=', 'roles.id')
+            ->where('users.id', $id)
+            ->orderBy('users.created_at', 'desc')
+            ->first();
     }
 }

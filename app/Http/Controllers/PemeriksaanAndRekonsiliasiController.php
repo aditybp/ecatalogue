@@ -22,8 +22,11 @@ class PemeriksaanAndRekonsiliasiController extends Controller
     public function getAllDataPemeriksaanRekonsiliasi()
     {
         $status = [
+            config('constants.STATUS_PEMERIKSAAN'),
             config('constants.STATUS_REKONSILIASI'),
             config('constants.STATUS_PENYEBARLUASAN_DATA'),
+            config('constants.STATUS_NOT_QUALIFIED_C'),
+            config('constants.STATUS_NOT_QUALIFIED_D'),
         ];
 
         $listData = $this->perencanaanDataService->tableListPerencanaanData($status);
@@ -71,21 +74,60 @@ class PemeriksaanAndRekonsiliasiController extends Controller
                 $filePath = "-";
             }
 
-            $storeData = $this->pengumpulanDataService->pemeriksaanDataList($request);
+            $blok_2_and_3 = json_decode($request['blok_2_and_3'], true);
+            $blok_4 = json_decode($request['blok_4'], true);
 
-            foreach ($storeData as $value) {
+            $storeDataValidasi = $this->pengumpulanDataService->pemeriksaanDataList($request);
+
+            $materialResult = [];
+
+            foreach ($blok_4[0]['material'] as $material) {
+                $materialResult[] = $this->pengumpulanDataService->updateIdentifikasiPemeriksaanUpdate('material', $material['id'], $material);
+            }
+
+            $peralatanResult = [];
+            foreach ($blok_4[0]['peralatan'] as $peralatan) {
+                $peralatanResult[] = $this->pengumpulanDataService->updateIdentifikasiPemeriksaanUpdate('peralatan', $peralatan['id'], $peralatan);
+            }
+
+            $tenagaKerjaResult = [];
+            foreach ($blok_4[0]['tenaga_kerja'] as $tenaga_kerja) {
+                $tenagaKerjaResult[] = $this->pengumpulanDataService->updateIdentifikasiPemeriksaanUpdate('tenaga_kerja', $tenaga_kerja['id'], $tenaga_kerja);
+            }
+
+            $this->pengumpulanDataService->updateShortlistVendorVerifikasiValidasi($request['identifikasi_kebutuhan_id'], $request['data_vendor_id'], $blok_2_and_3, $request['catatan_blok_v']);
+
+            foreach ($storeDataValidasi as $value) {
                 if (strtolower($value['status_pemeriksaan']) == "tidak memenuhi") {
-                    $this->pengumpulanDataService->changeStatusValidation($request['identifikasi_kebutuhan_id'], $filePath, config('constants.STATUS_REKONSILIASI'));
-                    break;
+                    if (
+                        $value['item_number'] == 'C1' ||
+                        $value['item_number'] == 'C2' ||
+                        $value['item_number'] == 'C3' ||
+                        $value['item_number'] == 'C4'
+                    ) {
+                        $statusValidation = config('constants.STATUS_NOT_QUALIFIED_C');
+                    } elseif (
+                        $value['item_number'] == 'D1' ||
+                        $value['item_number'] == 'D2'
+                    ) {
+                        $statusValidation = config('constants.STATUS_NOT_QUALIFIED_D');
+                    }
+
+                    $this->pengumpulanDataService->changeStatusValidation($request['identifikasi_kebutuhan_id'], $filePath, $statusValidation);
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Data berhasil disimpan',
+                        'data' => $storeDataValidasi
+                    ]);
                 }
             }
 
-            if ($storeData) {
+            if ($storeDataValidasi) {
                 $this->pengumpulanDataService->changeStatusValidation($request['identifikasi_kebutuhan_id'], $filePath, config('constants.STATUS_PENYEBARLUASAN_DATA'));
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Data berhasil disimpan',
-                    'data' => $storeData
+                    'data' => $storeDataValidasi
                 ]);
             }
         } catch (\Exception $e) {

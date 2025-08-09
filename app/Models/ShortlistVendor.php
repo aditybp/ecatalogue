@@ -30,6 +30,8 @@ class ShortlistVendor extends Model
         'id_pemeriksaan',
         'status_pemeriksaan',
         'verified_by',
+        "catatan",
+        "file_kuisioner"
     ];
 
     public function perencanaanData()
